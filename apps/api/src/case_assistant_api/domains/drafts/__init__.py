@@ -1,0 +1,1 @@
+"""Draft generation domain."""
