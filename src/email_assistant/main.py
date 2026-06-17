@@ -1,98 +1,59 @@
-"""FastAPI application factory and ASGI entrypoint."""
+"""FastAPI app — Email Generation Assistant with LangGraph guardrails."""
 
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator, Callable
-from contextlib import asynccontextmanager
-
-import structlog
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from scalar_fastapi import (
-    AgentScalarConfig,
-    get_scalar_api_reference,  # pyright: ignore[reportUnknownVariableType]
-)
-from starlette.responses import HTMLResponse
+from pydantic import BaseModel
 
-from email_assistant.api.admin import router as admin_router
-from email_assistant.api.cases import router as cases_router
-from email_assistant.api.emails import router as emails_router
-from email_assistant.api.health import router as health_router
+from email_assistant.agents.pipeline import generate_with_guardrails
 from email_assistant.config import get_settings
-from email_assistant.db.migrations import run_migrations
-from email_assistant.db.pool import close_pool, is_sqlite_mode, open_pool
-from email_assistant.domains.cases.repository import build_case_repository
-from email_assistant.domains.drafts.approval import get_draft_approval_store
-from email_assistant.domains.jobs.store import get_job_store
-from email_assistant.observability.logging import configure_logging
-from email_assistant.workers.dispatch import close_arq_pool
 
-logger = structlog.get_logger()
+app = FastAPI(title="Email Generation Assistant", version="0.1.0")
 
 
-async def _setup_durable_stores() -> None:
+class EmailRequest(BaseModel):
+    intent: str
+    key_facts: list[str]
+    tone: str
+
+
+class EmailResponse(BaseModel):
+    subject: str
+    body: str
+    model: str
+    strategy: str
+    tone_score: float
+    fact_score: float
+    clarity_score: float
+    warnings: list[str]
+    passed: bool
+    retries: int
+
+
+@app.get("/health")
+def health() -> dict:
+    return {"status": "ok"}
+
+
+@app.post("/generate", response_model=EmailResponse)
+def generate_email(req: EmailRequest) -> EmailResponse:
     settings = get_settings()
-    await open_pool(settings)
-    await run_migrations()
-
-    if not is_sqlite_mode():
-        case_repository = build_case_repository(settings)
-        await case_repository.setup()
-
-    await get_job_store().setup()
-    await get_draft_approval_store().setup()
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-    settings = get_settings()
-    settings.validate_startup_safety()
-    configure_logging(settings.log_level)
-    await _setup_durable_stores()
-    yield
-    await close_arq_pool()
-    await close_pool()
-
-
-def create_app() -> FastAPI:
-    settings = get_settings()
-    app = FastAPI(
-        title="Email Generation Assistant API",
-        version="0.1.0",
-        description="AI-powered email generation assistant with advanced prompt engineering and evaluation metrics.",
-        lifespan=lifespan,
-        debug=not settings.is_production,
+    result = generate_with_guardrails(
+        intent=req.intent,
+        key_facts=req.key_facts,
+        tone=req.tone,
+        model=settings.nvidia_model_a,
+        strategy="advanced",
     )
-    if settings.api_cors_origins:
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=settings.api_cors_origins,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
-    app.include_router(health_router)
-    app.include_router(admin_router)
-    app.include_router(cases_router)
-    app.include_router(emails_router)
-    app.add_api_route(
-        "/scalar",
-        build_scalar_api_reference(app.openapi_url),
-        methods=["GET"],
-        include_in_schema=False,
+    return EmailResponse(
+        subject=result["subject"],
+        body=result["body"],
+        model=settings.nvidia_model_a,
+        strategy="advanced",
+        tone_score=result["tone_score"],
+        fact_score=result["fact_score"],
+        clarity_score=result["clarity_score"],
+        warnings=result["warnings"],
+        passed=result["passed"],
+        retries=result["retries"],
     )
-    return app
-
-
-def build_scalar_api_reference(openapi_url: str | None) -> Callable[[], HTMLResponse]:
-    def scalar_api_reference() -> HTMLResponse:
-        return get_scalar_api_reference(
-            openapi_url=openapi_url,
-            title="Email Generation Assistant API Reference",
-            agent=AgentScalarConfig(disabled=True),
-        )
-
-    return scalar_api_reference
-
-
-app = create_app()

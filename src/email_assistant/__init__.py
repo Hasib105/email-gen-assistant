@@ -1,5 +1,1 @@
-"""Case Assistant FastAPI package."""
-
-__all__ = ["__version__"]
-
-__version__ = "0.1.0"
+"""Email assistant — simple email generation with NVIDIA models."""

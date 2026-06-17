@@ -1,74 +1,55 @@
 [project]
 name = "email-assistant"
 version = "0.1.0"
-description = "Email generation assistant workspace"
+description = "Email generation assistant with NVIDIA models and A/B evaluation"
 requires-python = ">=3.13"
 dependencies = [
-    "email-assistant[llm]",
+    "langchain-nvidia-ai-endpoints>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langgraph>=0.3.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.34.0",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "structlog>=24.0",
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.uv]
-package = false
-
-[tool.uv.workspace]
-members = ["apps/api"]
-
-[tool.uv.sources]
-email-assistant = { workspace = true }
+package = true
 
 [dependency-groups]
 dev = [
     "pyright>=1.1.400",
     "pytest>=8.4.0",
-    "pytest-asyncio>=1.0.0",
     "ruff>=0.11.0",
 ]
 
 [tool.ruff]
 line-length = 100
 target-version = "py313"
-extend-exclude = [".venv", ".references"]
+extend-exclude = [".venv"]
 
 [tool.ruff.lint]
-select = [
-    "E", "F", "W",
-    "I",
-    "B",
-    "C4",
-    "UP",
-    "SIM",
-    "RUF",
-    "TCH",
-    "PL",
-    "TID",
-    "ANN",
-]
-ignore = [
-    "ANN401",
-    "PLR0913",
-    "TC001",
-    "TC002",
-    "TC003",
-]
+select = ["E", "F", "W", "I", "B", "C4", "UP", "SIM", "RUF"]
+ignore = ["ANN401", "PLR0913"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["ANN", "PLR2004", "S101"]
-"**/scripts/seed.py" = ["E501"]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 
 [tool.pyright]
-include = ["apps/api/src", "apps/api/tests"]
-exclude = ["**/__pycache__", "**/.venv", ".references"]
-typeCheckingMode = "strict"
+include = ["src"]
+exclude = ["**/__pycache__", "**/.venv"]
+typeCheckingMode = "standard"
 pythonVersion = "3.13"
 reportMissingTypeStubs = false
-reportUnknownMemberType = "none"
-reportUnknownVariableType = "warning"
-reportUnknownArgumentType = "warning"
 
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests"]
-addopts = "-ra --strict-markers --strict-config"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"

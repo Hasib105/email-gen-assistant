@@ -1,32 +1,36 @@
-"""Advanced prompt templates for email generation.
-
-Uses a combination of three advanced prompting techniques:
-1. Role-Playing: The LLM acts as a professional email writing expert
-2. Chain-of-Thought: Step-by-step reasoning before writing
-3. Few-Shot Examples: High-quality reference emails for different tones
-"""
+"""Email generation agent — prompt templates + ChatNVIDIA LLM call."""
 
 from __future__ import annotations
 
-# Role-playing system prompt that establishes expertise
+import time
+from typing import cast
+
+from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import HumanMessage
+
+from email_assistant.agents.llm import get_llm
+from email_assistant.agents.schema import EmailDraft
+from email_assistant.config import Settings, get_settings
+
+
+# ── Advanced Prompt (Strategy A) ────────────────────────────────────────────
+
 SYSTEM_ROLE = """You are a world-class professional email writer with 15 years of experience
 in corporate communications. You craft emails that are clear, persuasive, and perfectly
 tailored to the requested tone. Your emails always have a compelling subject line and
 well-structured body that achieves the stated intent."""
 
-# Chain-of-Thought instruction for reasoning before writing
-CHAIN_OF_THOUGHT_INSTRUCTION = """Before writing the email, think through these steps:
+CHAIN_OF_THOUGHT = """Before writing the email, think through these steps:
 1. UNDERSTAND the intent: What is the primary goal of this email?
 2. ORGANIZE the facts: Which key facts are most relevant and in what order?
 3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?
 4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?
 5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.
 
-Then provide your final output as a structured EmailDraft with subject and body."""
+Output ONLY the final email with Subject and Body. No explanations."""
 
-# Few-shot examples for different tones
-FEW_SHOT_EXAMPLES = """
-## Example 1: Formal Tone
+FEW_SHOT = """
+EXAMPLE 1 — Formal:
 Intent: Request budget approval for Q3 marketing campaign
 Key Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads
 Tone: Formal
@@ -47,7 +51,7 @@ Best regards,
 
 ---
 
-## Example 2: Casual Tone
+EXAMPLE 2 — Casual:
 Intent: Invite colleague to team lunch
 Key Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion
 Tone: Casual
@@ -64,7 +68,7 @@ Cheers,
 
 ---
 
-## Example 3: Urgent Tone
+EXAMPLE 3 — Urgent:
 Intent: Notify team of critical production issue
 Key Facts: Payment service is down, affecting 30% of transactions, need all hands on deck
 Tone: Urgent
@@ -82,7 +86,7 @@ This is our top priority.
 
 ---
 
-## Example 4: Empathetic Tone
+EXAMPLE 4 — Empathetic:
 Intent: Respond to customer complaint about delayed shipment
 Key Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place
 Tone: Empathetic
@@ -94,43 +98,66 @@ I completely understand your frustration with the delay in receiving your order.
 
 Your refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.
 
-Your experience matters deeply to us, and we are committed to doing better. Please do not hesitate to reach out if there is anything else I can help you with.
+Your experience matters deeply to us.
 
 With sincere apologies,
 [Your Name]
 """
 
 
-def build_email_generation_prompt(
+def build_advanced_prompt(*, intent: str, key_facts: list[str], tone: str) -> str:
+    facts_block = "\n".join(f"- {f}" for f in key_facts)
+    return f"""{SYSTEM_ROLE}
+
+{CHAIN_OF_THOUGHT}
+
+{FEW_SHOT}
+
+---
+
+NOW WRITE THIS EMAIL:
+Intent: {intent}
+Key Facts:
+{facts_block}
+Tone: {tone}
+
+Email:"""
+
+
+# ── Naive Prompt (Strategy B — baseline) ─────────────────────────────────────
+
+def build_naive_prompt(*, intent: str, key_facts: list[str], tone: str) -> str:
+    facts_block = ", ".join(key_facts)
+    return f"""Write an email.
+Intent: {intent}
+Facts: {facts_block}
+Tone: {tone}"""
+
+
+# ── Generation ───────────────────────────────────────────────────────────────
+
+def generate(
     *,
     intent: str,
     key_facts: list[str],
     tone: str,
-) -> str:
-    """Build the full prompt using Role-Playing + Chain-of-Thought + Few-Shot prompting.
+    model: str,
+    strategy: str = "advanced",
+    settings: Settings | None = None,
+) -> tuple[str, str, float]:
+    """Generate email via ChatNVIDIA. Returns (subject, body, elapsed_seconds)."""
+    cfg = settings or get_settings()
+    if strategy == "naive":
+        prompt = build_naive_prompt(intent=intent, key_facts=key_facts, tone=tone)
+    else:
+        prompt = build_advanced_prompt(intent=intent, key_facts=key_facts, tone=tone)
 
-    This advanced prompt engineering technique combines:
-    1. Role-Playing: Establishes the LLM as an expert email writer
-    2. Chain-of-Thought: Guides step-by-step reasoning before writing
-    3. Few-Shot Examples: Provides high-quality reference outputs for different tones
-    """
-    facts_block = "\n".join(f"- {fact}" for fact in key_facts)
+    llm = get_llm(model=model, settings=cfg)
+    structured_llm = llm.with_structured_output(EmailDraft)
 
-    return f"""{SYSTEM_ROLE}
+    start = time.time()
+    result = structured_llm.invoke([HumanMessage(content=prompt)])
+    elapsed = time.time() - start
 
-{CHAIN_OF_THOUGHT_INSTRUCTION}
-
-{FEW_SHOT_EXAMPLES}
-
----
-
-## Now write an email for the following request:
-
-Intent: {intent}
-
-Key Facts:
-{facts_block}
-
-Tone: {tone}
-
-Think through the steps above, then provide your EmailDraft with subject and body."""
+    result = cast("EmailDraft", result)
+    return result.subject, result.body, elapsed

@@ -1,1 +1,1 @@
-"""LangGraph agent workflows."""
+"""Email generation agent components."""
