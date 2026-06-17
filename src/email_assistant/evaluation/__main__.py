@@ -1,5 +1,5 @@
-"""Allow running evaluation as: python -m case_assistant_api.evaluation"""
+"""Allow running evaluation as: python -m email_assistant.evaluation"""
 
-from case_assistant_api.evaluation.run_evaluation import main
+from email_assistant.evaluation.run_evaluation import main
 
 main()

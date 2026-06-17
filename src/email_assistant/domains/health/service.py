@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from case_assistant_api.config import get_settings
-from case_assistant_api.domains.health.schemas import HealthCheck, HealthResponse
+from email_assistant.config import get_settings
+from email_assistant.domains.health.schemas import HealthCheck, HealthResponse
 
 
 async def collect_health() -> HealthResponse:
@@ -17,7 +17,7 @@ async def collect_health() -> HealthResponse:
     ]
     return HealthResponse(
         status="ok" if all(check.ok for check in checks) else "degraded",
-        service="case-assistant-api",
+        service="email-assistant",
         env=settings.env,
         checks=checks,
     )

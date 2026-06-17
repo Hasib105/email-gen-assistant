@@ -8,8 +8,8 @@ COPY pyproject.toml ./
 COPY apps/api/pyproject.toml apps/api/pyproject.toml
 COPY apps/api/src apps/api/src
 
-RUN uv sync --no-dev --package case-assistant-api
+RUN uv sync --no-dev --package email-assistant
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "case_assistant_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "email_assistant.main:app", "--host", "0.0.0.0", "--port", "8000"]

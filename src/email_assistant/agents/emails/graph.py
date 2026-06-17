@@ -9,10 +9,10 @@ import structlog
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 
-from case_assistant_api.agents.emails.prompts import build_email_generation_prompt
-from case_assistant_api.agents.emails.schema import EmailDraft
-from case_assistant_api.agents.llm import get_llm
-from case_assistant_api.config import Settings, get_settings
+from email_assistant.agents.emails.prompts import build_email_generation_prompt
+from email_assistant.agents.emails.schema import EmailDraft
+from email_assistant.agents.llm import get_llm
+from email_assistant.config import Settings, get_settings
 
 logger = structlog.get_logger()
 

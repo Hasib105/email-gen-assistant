@@ -1,13 +1,13 @@
-"""Case repositories backed by PostgreSQL."""
+"""Case repositories backed by PostgreSQL or SQLite."""
 
 from __future__ import annotations
 
 from typing import Protocol, cast
 
 import orjson
-from case_assistant_api.config import Settings
-from case_assistant_api.db.pool import get_connection
-from case_assistant_api.domains.cases.schemas import CaseNotFoundError, CaseRecord
+from email_assistant.config import Settings
+from email_assistant.db.pool import get_connection, is_sqlite_mode
+from email_assistant.domains.cases.schemas import CaseNotFoundError, CaseRecord
 
 _DEFAULT_CASE_TABLE = "cases"
 
@@ -19,7 +19,7 @@ class CaseRepository(Protocol):
 
 
 class PostgresCaseRepository:
-    """Production PostgreSQL/Aurora case repository."""
+    """PostgreSQL/Aurora case repository."""
 
     def __init__(self, *, database_url: str, table_name: str = _DEFAULT_CASE_TABLE) -> None:
         self._database_url = database_url
@@ -45,7 +45,34 @@ class PostgresCaseRepository:
         return CaseRecord.model_validate(payload)
 
 
+class SqliteCaseRepository:
+    """SQLite case repository for local development."""
+
+    def __init__(self, *, table_name: str = _DEFAULT_CASE_TABLE) -> None:
+        self._table_name = table_name
+
+    async def setup(self) -> None:
+        return None
+
+    async def get_case(self, case_id: str) -> CaseRecord:
+        normalized = case_id.strip().upper()
+        query = f"SELECT payload FROM {self._table_name} WHERE case_id = ?"
+        async with get_connection() as connection:
+            cursor = await connection.execute(query, (normalized,))
+            row = await cursor.fetchone()
+
+        if row is None:
+            raise CaseNotFoundError(case_id=normalized)
+
+        payload_raw = row[0] if not isinstance(row, dict) else row["payload"]
+        payload = _coerce_payload(payload_raw)
+        return CaseRecord.model_validate(payload)
+
+
 def build_case_repository(settings: Settings) -> CaseRepository:
+    if is_sqlite_mode():
+        return SqliteCaseRepository(table_name=settings.case_table_name)
+
     backend = settings.case_repository_backend.lower().strip()
     if backend != "postgres":
         raise ValueError(
@@ -60,7 +87,7 @@ def build_case_repository(settings: Settings) -> CaseRepository:
 
 def validate_identifier(value: str) -> str:
     if not value or not value.replace("_", "").isalnum() or value[0].isdigit():
-        raise ValueError("Postgres identifier must contain only letters, digits, and underscores")
+        raise ValueError("Identifier must contain only letters, digits, and underscores")
     return value
 
 

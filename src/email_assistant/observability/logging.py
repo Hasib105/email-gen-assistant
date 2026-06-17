@@ -6,7 +6,7 @@ import logging
 
 import structlog
 
-from case_assistant_api.observability.redaction import redact_event_dict
+from email_assistant.observability.redaction import redact_event_dict
 
 
 def configure_logging(log_level: str) -> None:

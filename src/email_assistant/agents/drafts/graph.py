@@ -14,27 +14,27 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 
-from case_assistant_api.agents.drafts.checkpoints import open_draft_checkpointer
-from case_assistant_api.agents.drafts.prompts import build_customer_reply_prompt
-from case_assistant_api.agents.drafts.reply_schema import CaseDraftReply
-from case_assistant_api.agents.drafts.state import DraftGraphContext, DraftGraphState
-from case_assistant_api.agents.llm import get_llm
-from case_assistant_api.config import Settings, get_settings
-from case_assistant_api.domains.cases.repository import (
+from email_assistant.agents.drafts.checkpoints import open_draft_checkpointer
+from email_assistant.agents.drafts.prompts import build_customer_reply_prompt
+from email_assistant.agents.drafts.reply_schema import CaseDraftReply
+from email_assistant.agents.drafts.state import DraftGraphContext, DraftGraphState
+from email_assistant.agents.llm import get_llm
+from email_assistant.config import Settings, get_settings
+from email_assistant.domains.cases.repository import (
     CaseRepository,
     build_case_repository,
 )
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.drafts.schemas import DraftResponse, DraftValidation
-from case_assistant_api.domains.drafts.validation import validate_draft_grounding
-from case_assistant_api.domains.masking.service import PiiMasker
-from case_assistant_api.domains.rag.retriever import (
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.drafts.schemas import DraftResponse, DraftValidation
+from email_assistant.domains.drafts.validation import validate_draft_grounding
+from email_assistant.domains.masking.service import PiiMasker
+from email_assistant.domains.rag.retriever import (
     Evidence,
     EvidenceRetriever,
     build_retriever,
 )
-from case_assistant_api.domains.rag.sanitization import sanitize_evidence_for_case
-from case_assistant_api.security.output_guardrails import sanitize_generated_output
+from email_assistant.domains.rag.sanitization import sanitize_evidence_for_case
+from email_assistant.security.output_guardrails import sanitize_generated_output
 
 logger = structlog.get_logger()
 

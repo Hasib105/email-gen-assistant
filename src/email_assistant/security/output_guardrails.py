@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.masking.service import PiiMasker
-from case_assistant_api.domains.rag.sanitization import case_sensitive_values
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.masking.service import PiiMasker
+from email_assistant.domains.rag.sanitization import case_sensitive_values
 
 
 class GuardedDraftOutput(BaseModel):

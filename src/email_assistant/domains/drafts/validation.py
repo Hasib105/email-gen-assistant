@@ -5,9 +5,9 @@ from __future__ import annotations
 import re
 from datetime import UTC, datetime, timedelta
 
-from case_assistant_api.config import Settings
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.config import Settings
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.rag.retriever import Evidence
 
 _POLICY_COMMITMENT_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\b(refund|refunded|refunding)\b", re.I), "refund"),

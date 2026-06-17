@@ -3,7 +3,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 import pytest
-from case_assistant_api.db.migrations import run_migrations
+from email_assistant.db.migrations import run_migrations
 
 
 @pytest.mark.asyncio
@@ -12,29 +12,25 @@ async def test_run_migrations_applies_sql_once(monkeypatch: pytest.MonkeyPatch) 
     existing_versions: set[str] = set()
 
     class FakeConnection:
+        async def executescript(self, sql: str) -> None:
+            executed.append(sql)
+
         async def execute(self, sql: str, *args: object) -> None:
             _ = args
             executed.append(sql)
 
-        async def fetch(self, sql: str) -> list[dict[str, str]]:
-            _ = sql
-            return [{"version": version} for version in existing_versions]
+        async def fetchall(self) -> list[tuple[str]]:
+            return [(version,) for version in existing_versions]
 
-        def transaction(self) -> _FakeTransaction:
-            return _FakeTransaction()
-
-    class _FakeTransaction:
-        async def __aenter__(self) -> _FakeTransaction:
-            return self
-
-        async def __aexit__(self, *args: object) -> None:
+        async def commit(self) -> None:
             return None
 
     @asynccontextmanager
     async def fake_get_connection():
         yield FakeConnection()
 
-    monkeypatch.setattr("case_assistant_api.db.migrations.get_connection", fake_get_connection)
+    monkeypatch.setattr("email_assistant.db.pool.get_connection", fake_get_connection)
+    monkeypatch.setattr("email_assistant.db.pool._is_sqlite", True)
 
     applied = await run_migrations()
     assert applied == ["001_initial_schema"]

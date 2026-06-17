@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from case_assistant_api.observability.redaction import redact_sensitive
+from email_assistant.observability.redaction import redact_sensitive
 
 
 def test_redaction_removes_common_pii_and_secrets() -> None:

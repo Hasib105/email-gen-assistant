@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from case_assistant_api.main import create_app
+from email_assistant.main import create_app
 from fastapi.testclient import TestClient
 from httpx import Response
 

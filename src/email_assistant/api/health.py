@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from case_assistant_api.domains.health.schemas import HealthResponse
-from case_assistant_api.domains.health.service import collect_health
+from email_assistant.domains.health.schemas import HealthResponse
+from email_assistant.domains.health.service import collect_health
 
 router = APIRouter(tags=["health"])
 

@@ -14,17 +14,18 @@ from scalar_fastapi import (
 )
 from starlette.responses import HTMLResponse
 
-from case_assistant_api.api.admin import router as admin_router
-from case_assistant_api.api.cases import router as cases_router
-from case_assistant_api.api.emails import router as emails_router
-from case_assistant_api.api.health import router as health_router
-from case_assistant_api.config import get_settings
-from case_assistant_api.db.migrations import run_migrations
-from case_assistant_api.db.pool import close_pool, open_pool
-from case_assistant_api.domains.cases.repository import build_case_repository
-from case_assistant_api.domains.jobs.store import get_job_store
-from case_assistant_api.observability.logging import configure_logging
-from case_assistant_api.workers.dispatch import close_arq_pool
+from email_assistant.api.admin import router as admin_router
+from email_assistant.api.cases import router as cases_router
+from email_assistant.api.emails import router as emails_router
+from email_assistant.api.health import router as health_router
+from email_assistant.config import get_settings
+from email_assistant.db.migrations import run_migrations
+from email_assistant.db.pool import close_pool, is_sqlite_mode, open_pool
+from email_assistant.domains.cases.repository import build_case_repository
+from email_assistant.domains.drafts.approval import get_draft_approval_store
+from email_assistant.domains.jobs.store import get_job_store
+from email_assistant.observability.logging import configure_logging
+from email_assistant.workers.dispatch import close_arq_pool
 
 logger = structlog.get_logger()
 
@@ -33,9 +34,13 @@ async def _setup_durable_stores() -> None:
     settings = get_settings()
     await open_pool(settings)
     await run_migrations()
-    case_repository = build_case_repository(settings)
-    await case_repository.setup()
+
+    if not is_sqlite_mode():
+        case_repository = build_case_repository(settings)
+        await case_repository.setup()
+
     await get_job_store().setup()
+    await get_draft_approval_store().setup()
 
 
 @asynccontextmanager

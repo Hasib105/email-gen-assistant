@@ -3,8 +3,8 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 import pytest
-from case_assistant_api.config import Settings
-from case_assistant_api.domains.cases.repository import (
+from email_assistant.config import Settings
+from email_assistant.domains.cases.repository import (
     PostgresCaseRepository,
     build_case_repository,
 )
@@ -37,7 +37,7 @@ async def test_postgres_case_repository_loads_payload(
         yield FakeConnection()
 
     monkeypatch.setattr(
-        "case_assistant_api.domains.cases.repository.get_connection",
+        "email_assistant.domains.cases.repository.get_connection",
         fake_get_connection,
     )
 
@@ -53,7 +53,12 @@ async def test_postgres_case_repository_loads_payload(
 
 def test_build_case_repository_rejects_non_postgres_backend() -> None:
     with pytest.raises(ValueError, match="Unsupported CASE_REPOSITORY_BACKEND"):
-        build_case_repository(Settings(case_repository_backend="fixture"))
+        build_case_repository(
+            Settings(
+                case_repository_backend="fixture",
+                database_url="postgresql://localhost/test",
+            )
+        )
 
 
 def test_build_case_repository_rejects_unsafe_table_name() -> None:
@@ -61,6 +66,7 @@ def test_build_case_repository_rejects_unsafe_table_name() -> None:
         build_case_repository(
             Settings(
                 case_repository_backend="postgres",
+                database_url="postgresql://localhost/test",
                 case_table_name="cases;drop",
             )
         )

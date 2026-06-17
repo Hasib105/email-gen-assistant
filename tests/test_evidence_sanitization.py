@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from case_assistant_api.agents.drafts.prompts import build_customer_reply_prompt
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.masking.service import PiiMasker
-from case_assistant_api.domains.rag.retriever import Evidence
-from case_assistant_api.domains.rag.sanitization import sanitize_evidence_for_case
+from email_assistant.agents.drafts.prompts import build_customer_reply_prompt
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.masking.service import PiiMasker
+from email_assistant.domains.rag.retriever import Evidence
+from email_assistant.domains.rag.sanitization import sanitize_evidence_for_case
 
 
 def _case() -> CaseRecord:

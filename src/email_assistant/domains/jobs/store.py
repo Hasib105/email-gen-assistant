@@ -9,9 +9,9 @@ from functools import lru_cache
 from typing import Any, Protocol
 
 import orjson
-from case_assistant_api.config import get_settings
-from case_assistant_api.db.pool import get_pool
-from case_assistant_api.domains.jobs.schemas import JobRecord, JobStatus, JobType, utc_now
+from email_assistant.config import get_settings
+from email_assistant.db.pool import get_pool, is_sqlite_mode
+from email_assistant.domains.jobs.schemas import JobRecord, JobStatus, JobType, utc_now
 
 
 class JobStore(Protocol):
@@ -390,6 +390,6 @@ class PostgresJobStore:
 @lru_cache(maxsize=1)
 def get_job_store() -> JobStore:
     settings = get_settings()
-    if settings.job_store_backend == "postgres":
-        return PostgresJobStore(database_url=settings.database_url)
-    return InMemoryJobStore()
+    if is_sqlite_mode() or settings.job_store_backend != "postgres":
+        return InMemoryJobStore()
+    return PostgresJobStore(database_url=settings.database_url)

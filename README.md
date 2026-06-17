@@ -33,7 +33,7 @@ docker compose -f infra/compose/docker-compose.yml up postgres redis opensearch 
 ## Daily Dev Loop
 
 ```bash
-uv run uvicorn case_assistant_api.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn email_assistant.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Open:
@@ -68,7 +68,7 @@ curl -X POST http://localhost:8000/emails/generate \
 ### Run Evaluation
 
 ```bash
-uv run python -m case_assistant_api.evaluation.run_evaluation
+uv run python -m email_assistant.evaluation.run_evaluation
 ```
 
 ## Project Structure
@@ -98,7 +98,7 @@ The project implements 3 custom evaluation metrics:
 Run the full evaluation suite:
 
 ```bash
-uv run python -m case_assistant_api.evaluation.run_evaluation
+uv run python -m email_assistant.evaluation.run_evaluation
 ```
 
 Output: `evaluation_report.json` with raw scores and averages.

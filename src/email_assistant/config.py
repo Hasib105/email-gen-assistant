@@ -42,13 +42,13 @@ class Settings(BaseSettings):
     api_cors_origins: Annotated[list[str], NoDecode] = Field(default_factory=list)
     admin_api_key: str = ""
 
-    database_url: str = "postgresql://case_assistant:case_assistant@localhost:5432/case_assistant"
+    database_url: str = "sqlite:///./email_assistant.db"
     database_ssl_mode: str = "disable"
     database_pool_min_size: int = 1
     database_pool_max_size: int = 10
     database_connect_timeout_seconds: float = 10.0
     database_command_timeout_seconds: float = 30.0
-    case_repository_backend: str = "postgres"
+    case_repository_backend: str = "sqlite"
     case_table_name: str = "cases"
     evidence_stale_after_days: int = 365
     evidence_min_relevance_score: float = 1.0
@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     opensearch_index: str = "email-assistant-evidence"
     qdrant_url: str = "http://localhost:6333"
     qdrant_collection: str = "email_assistant_evidence"
-    rag_backend: str = "hybrid"
+    rag_backend: str = "none"
     integration_retry_attempts: int = 3
     retrieval_timeout_seconds: float = 5.0
 
@@ -76,6 +76,8 @@ class Settings(BaseSettings):
     response_language: str = "English"
     gemini_api_key: str = ""
     openai_api_key: str = ""
+    openrouter_api_key: str = ""
+    nvidia_api_key: str = ""
     pii_restore_approved: bool = False
 
     @field_validator("api_cors_origins", mode="before")

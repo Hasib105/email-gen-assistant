@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.domains.rag.retriever import Evidence
 from pydantic import BaseModel, ConfigDict, Field
 
 

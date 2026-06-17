@@ -5,8 +5,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-from case_assistant_api.domains.cases.schemas import CaseNotFoundError, CaseRecord
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.domains.cases.schemas import CaseNotFoundError, CaseRecord
+from email_assistant.domains.rag.retriever import Evidence
 
 
 def _seed_module() -> object:

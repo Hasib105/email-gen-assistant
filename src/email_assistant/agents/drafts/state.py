@@ -5,14 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypedDict
 
-from case_assistant_api.config import get_settings
-from case_assistant_api.domains.cases.repository import (
+from email_assistant.config import get_settings
+from email_assistant.domains.cases.repository import (
     CaseRepository,
     build_case_repository,
 )
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.masking.service import PiiMasker
-from case_assistant_api.domains.rag.retriever import (
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.masking.service import PiiMasker
+from email_assistant.domains.rag.retriever import (
     Evidence,
     EvidenceRetriever,
     build_retriever,
@@ -21,7 +21,7 @@ from case_assistant_api.domains.rag.retriever import (
 if TYPE_CHECKING:
     from langchain_core.language_models import BaseChatModel
 
-    from case_assistant_api.config import Settings
+    from email_assistant.config import Settings
 
 
 class DraftGraphState(TypedDict, total=False):

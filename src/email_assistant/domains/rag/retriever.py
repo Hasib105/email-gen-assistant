@@ -9,9 +9,9 @@ from urllib.parse import quote
 
 import httpx
 import structlog
-from case_assistant_api.config import Settings
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.resilience import retry_async
+from email_assistant.config import Settings
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.resilience import retry_async
 from pydantic import BaseModel, ConfigDict, Field
 
 logger = structlog.get_logger()
@@ -232,8 +232,19 @@ class HybridEvidenceRetriever:
         return await self._fallback.retrieve(case)
 
 
+class NullEvidenceRetriever:
+    """No-op retriever when RAG is disabled."""
+
+    async def retrieve(self, case: CaseRecord) -> list[Evidence]:
+        return []
+
+
 def build_retriever(settings: Settings) -> EvidenceRetriever:
     backend = settings.rag_backend.lower().strip()
+
+    if backend in {"none", "off", ""}:
+        return NullEvidenceRetriever()
+
     opensearch = OpenSearchRetriever(
         url=settings.opensearch_url,
         index_name=settings.opensearch_index,
@@ -256,7 +267,7 @@ def build_retriever(settings: Settings) -> EvidenceRetriever:
         return HybridEvidenceRetriever([opensearch, qdrant])
     raise ValueError(
         f"Unsupported RAG_BACKEND={backend!r}. "
-        "Use opensearch, qdrant, or hybrid and seed data with scripts/seed.py."
+        "Use opensearch, qdrant, hybrid, or none."
     )
 
 

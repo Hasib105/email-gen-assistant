@@ -7,9 +7,9 @@ from arq import create_pool
 from arq.connections import ArqRedis, RedisSettings
 from fastapi import BackgroundTasks
 
-from case_assistant_api.config import Settings, get_settings
-from case_assistant_api.domains.jobs.schemas import JobType
-from case_assistant_api.domains.jobs.store import get_job_store
+from email_assistant.config import Settings, get_settings
+from email_assistant.domains.jobs.schemas import JobType
+from email_assistant.domains.jobs.store import get_job_store
 
 logger = structlog.get_logger()
 

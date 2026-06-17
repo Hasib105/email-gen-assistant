@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from case_assistant_api.agents.drafts.graph import DraftGraphAgent
-from case_assistant_api.domains.cases.repository import CaseRepository
-from case_assistant_api.domains.drafts.schemas import DraftResponse
-from case_assistant_api.domains.masking.service import PiiMasker
-from case_assistant_api.domains.rag.retriever import EvidenceRetriever
+from email_assistant.agents.drafts.graph import DraftGraphAgent
+from email_assistant.domains.cases.repository import CaseRepository
+from email_assistant.domains.drafts.schemas import DraftResponse
+from email_assistant.domains.masking.service import PiiMasker
+from email_assistant.domains.rag.retriever import EvidenceRetriever
 
 
 class DraftService:

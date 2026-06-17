@@ -3,16 +3,16 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from case_assistant_api.config import Settings
-from case_assistant_api.domains.cases.schemas import CaseNotFoundError, CaseRecord, FlightSegment
-from case_assistant_api.domains.drafts.validation import (
+from email_assistant.config import Settings
+from email_assistant.domains.cases.schemas import CaseNotFoundError, CaseRecord, FlightSegment
+from email_assistant.domains.drafts.validation import (
     assess_evidence_quality,
     detect_conflicting_evidence,
     validate_draft_grounding,
     validate_itinerary_consistency,
     validate_policy_claims,
 )
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.domains.rag.retriever import Evidence
 
 
 def _sample_case() -> CaseRecord:

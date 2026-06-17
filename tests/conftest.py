@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 import pytest
-from case_assistant_api.config import get_settings
-from case_assistant_api.domains.drafts.approval import get_draft_approval_store
-from case_assistant_api.domains.jobs.store import get_job_store
+from email_assistant.config import get_settings
+from email_assistant.domains.drafts.approval import get_draft_approval_store
+from email_assistant.domains.jobs.store import get_job_store
 
 
 @pytest.fixture(autouse=True)

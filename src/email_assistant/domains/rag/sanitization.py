@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.masking.service import PiiMasker
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.masking.service import PiiMasker
+from email_assistant.domains.rag.retriever import Evidence
 
 
 def sanitize_evidence_for_case(

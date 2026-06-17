@@ -3,10 +3,10 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from case_assistant_api.agents import drafts as drafts_pkg
-from case_assistant_api.agents.drafts.reply_schema import CaseDraftReply
-from case_assistant_api.config import Settings, get_settings
-from case_assistant_api.domains.drafts.service import DraftService
+from email_assistant.agents import drafts as drafts_pkg
+from email_assistant.agents.drafts.reply_schema import CaseDraftReply
+from email_assistant.config import Settings, get_settings
+from email_assistant.domains.drafts.service import DraftService
 from repository_fixtures import SeedCaseRepository, SeedEvidenceRetriever
 
 
@@ -39,7 +39,7 @@ def _patch_llm(
         return fake_llm
 
     monkeypatch.setattr(
-        "case_assistant_api.agents.drafts.graph.get_llm",
+        "email_assistant.agents.drafts.graph.get_llm",
         _get_fake_llm,
     )
 

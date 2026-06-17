@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from case_assistant_api.config import Settings
-from case_assistant_api.domains.rag.indexer import EvidenceIndexService
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.config import Settings
+from email_assistant.domains.rag.indexer import EvidenceIndexService
+from email_assistant.domains.rag.retriever import Evidence
 
 
 class _FakeResponse:
@@ -36,7 +36,7 @@ async def test_evidence_indexer_stores_seed_catalog_in_opensearch_and_qdrant(
             calls.append(("PUT", url, json))
             return _FakeResponse()
 
-    monkeypatch.setattr("case_assistant_api.domains.rag.indexer.httpx.AsyncClient", FakeClient)
+    monkeypatch.setattr("email_assistant.domains.rag.indexer.httpx.AsyncClient", FakeClient)
 
     service = EvidenceIndexService(
         Settings(
@@ -73,13 +73,13 @@ async def test_evidence_indexer_stores_seed_catalog_in_opensearch_and_qdrant(
 
     assert {result.backend for result in results} == {"opensearch", "qdrant"}
     assert all(result.ok for result in results)
-    assert any(call[1] == "http://opensearch:9200/case-assistant-evidence" for call in calls)
+    assert any(call[1] == "http://opensearch:9200/email-assistant-evidence" for call in calls)
     assert any(
-        call[1] == "http://qdrant:6333/collections/case_assistant_evidence/points" for call in calls
+        call[1] == "http://qdrant:6333/collections/email_assistant_evidence/points" for call in calls
     )
     qdrant_points = next(
         call[2]["points"]
         for call in calls
-        if call[1] == "http://qdrant:6333/collections/case_assistant_evidence/points"
+        if call[1] == "http://qdrant:6333/collections/email_assistant_evidence/points"
     )
     assert len(qdrant_points) == 3

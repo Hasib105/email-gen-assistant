@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from case_assistant_api.resilience import retry_async
+from email_assistant.resilience import retry_async
 
 
 @pytest.mark.asyncio

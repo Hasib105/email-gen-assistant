@@ -6,13 +6,13 @@ from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from case_assistant_api.agents.drafts.checkpoints import open_draft_checkpointer
-from case_assistant_api.agents.drafts.graph import DraftGraphAgent, get_draft_graph
-from case_assistant_api.agents.drafts.prompts import build_customer_reply_prompt
-from case_assistant_api.agents.drafts.reply_schema import CaseDraftReply
-from case_assistant_api.config import Settings
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.agents.drafts.checkpoints import open_draft_checkpointer
+from email_assistant.agents.drafts.graph import DraftGraphAgent, get_draft_graph
+from email_assistant.agents.drafts.prompts import build_customer_reply_prompt
+from email_assistant.agents.drafts.reply_schema import CaseDraftReply
+from email_assistant.config import Settings
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.rag.retriever import Evidence
 from repository_fixtures import SeedCaseRepository, SeedEvidenceRetriever
 
 
@@ -336,7 +336,7 @@ async def test_draft_checkpointer_uses_postgres_when_url_is_provided(
         return FakePostgresSaver()
 
     monkeypatch.setattr(
-        "case_assistant_api.agents.drafts.checkpoints.AsyncPostgresSaver.from_conn_string",
+        "email_assistant.agents.drafts.checkpoints.AsyncPostgresSaver.from_conn_string",
         from_conn_string,
     )
 
@@ -374,13 +374,13 @@ async def test_draft_checkpointer_uses_sqlite_when_postgres_checkpoint_url_is_em
         return FakePostgresSaver()
 
     monkeypatch.setattr(
-        "case_assistant_api.agents.drafts.checkpoints.AsyncPostgresSaver.from_conn_string",
+        "email_assistant.agents.drafts.checkpoints.AsyncPostgresSaver.from_conn_string",
         from_conn_string,
     )
 
     async with open_draft_checkpointer(
         Settings(
-            database_url="postgresql://case_assistant:case_assistant@localhost:5432/case_assistant",
+            database_url="postgresql://email_assistant:email_assistant@localhost:5432/email_assistant",
             langgraph_postgres_url="",
             langgraph_sqlite_path=str(tmp_path / "checkpoints.sqlite"),
         )

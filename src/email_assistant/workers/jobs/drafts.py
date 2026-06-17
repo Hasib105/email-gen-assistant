@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from case_assistant_api.domains.drafts.schemas import DraftResponse
-from case_assistant_api.domains.drafts.service import DraftService
+from email_assistant.domains.drafts.schemas import DraftResponse
+from email_assistant.domains.drafts.service import DraftService
 
 
 async def generate_case_draft_job(case_id: str) -> DraftResponse:

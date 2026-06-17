@@ -5,8 +5,8 @@ import time
 from typing import Any
 
 import pytest
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.rag.retriever import (
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.rag.retriever import (
     Evidence,
     HybridEvidenceRetriever,
     OpenSearchRetriever,
@@ -73,12 +73,12 @@ async def test_opensearch_retriever_maps_hits_to_evidence(
                 }
             )
 
-    monkeypatch.setattr("case_assistant_api.domains.rag.retriever.httpx.AsyncClient", FakeClient)
+    monkeypatch.setattr("email_assistant.domains.rag.retriever.httpx.AsyncClient", FakeClient)
 
     case = _sample_case()
     retriever = OpenSearchRetriever(
         url="http://opensearch:9200",
-        index_name="case-assistant-evidence",
+        index_name="email-assistant-evidence",
         timeout_seconds=2.0,
         retry_attempts=1,
     )
@@ -87,7 +87,7 @@ async def test_opensearch_retriever_maps_hits_to_evidence(
 
     assert evidence[0].source == "sop://flight"
     assert evidence[0].title == "Flight disruption SOP"
-    assert calls[0][0] == "http://opensearch:9200/case-assistant-evidence/_search"
+    assert calls[0][0] == "http://opensearch:9200/email-assistant-evidence/_search"
 
 
 @pytest.mark.asyncio
@@ -131,12 +131,12 @@ async def test_qdrant_retriever_maps_payloads_to_ranked_evidence(
                 }
             )
 
-    monkeypatch.setattr("case_assistant_api.domains.rag.retriever.httpx.AsyncClient", FakeClient)
+    monkeypatch.setattr("email_assistant.domains.rag.retriever.httpx.AsyncClient", FakeClient)
 
     case = _sample_case()
     retriever = QdrantRetriever(
         url="http://qdrant:6333",
-        collection_name="case_assistant_evidence",
+        collection_name="email_assistant_evidence",
         timeout_seconds=2.0,
         retry_attempts=1,
     )
@@ -144,7 +144,7 @@ async def test_qdrant_retriever_maps_payloads_to_ranked_evidence(
     evidence = await retriever.retrieve(case)
 
     assert evidence[0].source == "sop://flight-disruption"
-    assert calls[0][0] == "http://qdrant:6333/collections/case_assistant_evidence/points/scroll"
+    assert calls[0][0] == "http://qdrant:6333/collections/email_assistant_evidence/points/scroll"
     assert calls[0][1]["with_payload"] is True
 
 

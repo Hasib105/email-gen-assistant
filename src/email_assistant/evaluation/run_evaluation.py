@@ -13,14 +13,14 @@ from pathlib import Path
 
 import structlog
 
-from case_assistant_api.agents.emails.graph import EmailGenerationAgent
-from case_assistant_api.evaluation.metrics import (
+from email_assistant.agents.emails.graph import EmailGenerationAgent
+from email_assistant.evaluation.metrics import (
     ClarityConcisenessMetric,
     FactRecallMetric,
     MetricResult,
     ToneAlignmentMetric,
 )
-from case_assistant_api.evaluation.scenarios import TEST_SCENARIOS, TestScenario
+from email_assistant.evaluation.scenarios import TEST_SCENARIOS, TestScenario
 
 logger = structlog.get_logger()
 

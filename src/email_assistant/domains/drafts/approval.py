@@ -1,7 +1,7 @@
 """Draft review state for human approval workflows.
 
-All draft approval state is persisted in PostgreSQL via ``PostgresDraftApprovalStore``.
-There is no in-memory fallback — every environment uses the database.
+PostgreSQL via ``PostgresDraftApprovalStore`` for production,
+in-memory ``InMemoryDraftApprovalStore`` for SQLite/local development.
 """
 
 from __future__ import annotations
@@ -13,9 +13,9 @@ from functools import lru_cache
 from typing import Any, Protocol
 
 import orjson
-from case_assistant_api.config import get_settings
-from case_assistant_api.db.pool import get_pool
-from case_assistant_api.domains.drafts.schemas import DraftResponse
+from email_assistant.config import get_settings
+from email_assistant.db.pool import get_pool, is_sqlite_mode
+from email_assistant.domains.drafts.schemas import DraftResponse
 
 
 def _now() -> datetime:
@@ -101,6 +101,152 @@ CREATE TABLE IF NOT EXISTS {_DRAFT_AUDIT_TABLE} (
 CREATE INDEX IF NOT EXISTS idx_draft_audit_case_id
     ON {_DRAFT_AUDIT_TABLE}(case_id);
 """
+
+
+class InMemoryDraftApprovalStore:
+    """In-memory draft approval store for SQLite/local development."""
+
+    def __init__(self) -> None:
+        self._approvals: dict[str, StoredDraft] = {}
+
+    async def setup(self) -> None:
+        return None
+
+    async def save_pending(self, draft: DraftResponse, *, user_id: str) -> StoredDraft:
+        now = _now()
+        case_id = draft.case_id.upper()
+        stored = StoredDraft(
+            case_id=case_id,
+            draft=draft,
+            status=DraftApprovalStatus.PENDING,
+            created_by=user_id,
+            created_at=now,
+            updated_at=now,
+            audit_events=(DraftAuditEvent(
+                event_type="draft_generated",
+                case_id=case_id,
+                user_id=user_id,
+                created_at=now,
+            ),),
+        )
+        self._approvals[case_id] = stored
+        return stored
+
+    async def save_edited(self, draft: DraftResponse, *, user_id: str) -> StoredDraft:
+        now = _now()
+        case_id = draft.case_id.upper()
+        existing = self._approvals.get(case_id)
+        events = list(existing.audit_events) if existing else []
+        events.append(DraftAuditEvent(
+            event_type="draft_edited",
+            case_id=case_id,
+            user_id=user_id,
+            created_at=now,
+        ))
+        stored = StoredDraft(
+            case_id=case_id,
+            draft=draft,
+            status=DraftApprovalStatus.EDITED,
+            created_by=existing.created_by if existing else user_id,
+            created_at=existing.created_at if existing else now,
+            updated_at=now,
+            audit_events=tuple(events),
+        )
+        self._approvals[case_id] = stored
+        return stored
+
+    async def approve(self, case_id: str, *, user_id: str) -> StoredDraft | None:
+        normalized = case_id.upper()
+        existing = self._approvals.get(normalized)
+        if existing is None:
+            return None
+        now = _now()
+        events = list(existing.audit_events) + [DraftAuditEvent(
+            event_type="draft_approved",
+            case_id=normalized,
+            user_id=user_id,
+            created_at=now,
+        )]
+        stored = StoredDraft(
+            case_id=normalized,
+            draft=existing.draft,
+            status=DraftApprovalStatus.APPROVED,
+            created_by=existing.created_by,
+            created_at=existing.created_at,
+            updated_at=now,
+            approved_by=user_id,
+            approved_at=now,
+            audit_events=tuple(events),
+        )
+        self._approvals[normalized] = stored
+        return stored
+
+    async def reject(self, case_id: str, *, user_id: str, note: str = "") -> StoredDraft | None:
+        normalized = case_id.upper()
+        existing = self._approvals.get(normalized)
+        if existing is None:
+            return None
+        now = _now()
+        events = list(existing.audit_events) + [DraftAuditEvent(
+            event_type="draft_rejected",
+            case_id=normalized,
+            user_id=user_id,
+            created_at=now,
+            note=note,
+        )]
+        stored = StoredDraft(
+            case_id=normalized,
+            draft=existing.draft,
+            status=DraftApprovalStatus.REJECTED,
+            created_by=existing.created_by,
+            created_at=existing.created_at,
+            updated_at=now,
+            review_notes=note,
+            audit_events=tuple(events),
+        )
+        self._approvals[normalized] = stored
+        return stored
+
+    async def record_event(
+        self,
+        case_id: str,
+        *,
+        event_type: str,
+        user_id: str,
+        note: str = "",
+    ) -> StoredDraft | None:
+        normalized = case_id.upper()
+        existing = self._approvals.get(normalized)
+        if existing is None:
+            return None
+        now = _now()
+        events = list(existing.audit_events) + [DraftAuditEvent(
+            event_type=event_type,
+            case_id=normalized,
+            user_id=user_id,
+            created_at=now,
+            note=note,
+        )]
+        stored = StoredDraft(
+            case_id=normalized,
+            draft=existing.draft,
+            status=existing.status,
+            created_by=existing.created_by,
+            created_at=existing.created_at,
+            updated_at=now,
+            approved_by=existing.approved_by,
+            approved_at=existing.approved_at,
+            review_notes=existing.review_notes,
+            audit_events=tuple(events),
+        )
+        self._approvals[normalized] = stored
+        return stored
+
+    async def get(self, case_id: str) -> StoredDraft | None:
+        return self._approvals.get(case_id.upper())
+
+    async def clear(self) -> None:
+        self._approvals.clear()
 
 
 def _serialize_draft(draft: DraftResponse) -> str:
@@ -447,10 +593,11 @@ class PostgresDraftApprovalStore:
 
 
 @lru_cache(maxsize=1)
-def get_draft_approval_store() -> PostgresDraftApprovalStore:
-    """Return the PostgreSQL-backed approval store.
+def get_draft_approval_store() -> DraftApprovalStore:
+    """Return the approval store — in-memory for SQLite, PostgreSQL otherwise.
 
-    The database URL comes from ``Settings.database_url`` at first call.
     Call ``get_draft_approval_store.cache_clear()`` to reset.
     """
+    if is_sqlite_mode():
+        return InMemoryDraftApprovalStore()
     return PostgresDraftApprovalStore(database_url=get_settings().database_url)

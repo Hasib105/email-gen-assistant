@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
 
-from case_assistant_api.domains.cases.schemas import CaseNotFoundError
-from case_assistant_api.domains.drafts.schemas import DraftResponse
-from case_assistant_api.domains.drafts.service import DraftService
+from email_assistant.domains.cases.schemas import CaseNotFoundError
+from email_assistant.domains.drafts.schemas import DraftResponse
+from email_assistant.domains.drafts.service import DraftService
 
 router = APIRouter(prefix="/cases", tags=["cases"])
 

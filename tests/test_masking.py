@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from case_assistant_api.domains.masking.service import PiiMasker
+from email_assistant.domains.masking.service import PiiMasker
 
 
 def test_masking_replaces_known_sensitive_values() -> None:

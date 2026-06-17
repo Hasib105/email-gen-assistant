@@ -10,9 +10,9 @@ from uuid import NAMESPACE_URL, uuid5
 
 import httpx
 import structlog
-from case_assistant_api.config import Settings
-from case_assistant_api.domains.rag.retriever import Evidence
-from case_assistant_api.resilience import retry_async
+from email_assistant.config import Settings
+from email_assistant.domains.rag.retriever import Evidence
+from email_assistant.resilience import retry_async
 
 logger = structlog.get_logger()
 

@@ -1,27 +1,27 @@
-name: case-assistant
+name: email-assistant
 
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: case-assistant-postgres
+    container_name: email-assistant-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-case_assistant}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-case_assistant}
-      POSTGRES_DB: ${POSTGRES_DB:-case_assistant}
+      POSTGRES_USER: ${POSTGRES_USER:-email_assistant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-email_assistant}
+      POSTGRES_DB: ${POSTGRES_DB:-email_assistant}
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-case_assistant}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-email_assistant}"]
       interval: 5s
       timeout: 3s
       retries: 10
 
   redis:
     image: redis:7-alpine
-    container_name: case-assistant-redis
+    container_name: email-assistant-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -35,7 +35,7 @@ services:
 
   opensearch:
     image: opensearchproject/opensearch:2
-    container_name: case-assistant-opensearch
+    container_name: email-assistant-opensearch
     restart: unless-stopped
     environment:
       discovery.type: single-node
@@ -54,7 +54,7 @@ services:
 
   qdrant:
     image: qdrant/qdrant:v1.12.5
-    container_name: case-assistant-qdrant
+    container_name: email-assistant-qdrant
     restart: unless-stopped
     ports:
       - "6333:6333"
@@ -67,11 +67,11 @@ services:
     build:
       context: ../..
       dockerfile: infra/dockerfiles/api.Dockerfile
-    container_name: case-assistant-api
+    container_name: email-assistant-api
     restart: unless-stopped
     env_file: ../../.env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-case_assistant}:${POSTGRES_PASSWORD:-case_assistant}@postgres:5432/${POSTGRES_DB:-case_assistant}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-email_assistant}:${POSTGRES_PASSWORD:-email_assistant}@postgres:5432/${POSTGRES_DB:-email_assistant}
       CASE_REPOSITORY_BACKEND: ${CASE_REPOSITORY_BACKEND:-postgres}
       CASE_TABLE_NAME: ${CASE_TABLE_NAME:-cases}
       REDIS_URL: redis://redis:6379/0
@@ -92,12 +92,12 @@ services:
     build:
       context: ../..
       dockerfile: infra/dockerfiles/api.Dockerfile
-    container_name: case-assistant-worker
+    container_name: email-assistant-worker
     restart: unless-stopped
     env_file: ../../.env
-    command: ["uv", "run", "arq", "case_assistant_api.workers.arq.settings.WorkerSettings"]
+    command: ["uv", "run", "arq", "email_assistant.workers.arq.settings.WorkerSettings"]
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-case_assistant}:${POSTGRES_PASSWORD:-case_assistant}@postgres:5432/${POSTGRES_DB:-case_assistant}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-email_assistant}:${POSTGRES_PASSWORD:-email_assistant}@postgres:5432/${POSTGRES_DB:-email_assistant}
       CASE_REPOSITORY_BACKEND: ${CASE_REPOSITORY_BACKEND:-postgres}
       CASE_TABLE_NAME: ${CASE_TABLE_NAME:-cases}
       REDIS_URL: redis://redis:6379/0

@@ -1,10 +1,10 @@
 [project]
-name = "case-assistant"
+name = "email-assistant"
 version = "0.1.0"
 description = "Email generation assistant workspace"
 requires-python = ">=3.13"
 dependencies = [
-    "case-assistant-api[llm]",
+    "email-assistant[llm]",
 ]
 
 [tool.uv]
@@ -14,7 +14,7 @@ package = false
 members = ["apps/api"]
 
 [tool.uv.sources]
-case-assistant-api = { workspace = true }
+email-assistant = { workspace = true }
 
 [dependency-groups]
 dev = [

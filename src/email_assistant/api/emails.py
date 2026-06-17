@@ -8,7 +8,7 @@ import structlog
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from case_assistant_api.agents.emails.graph import EmailGenerationAgent
+from email_assistant.agents.emails.graph import EmailGenerationAgent
 
 logger = structlog.get_logger()
 router = APIRouter(prefix="/emails", tags=["emails"])

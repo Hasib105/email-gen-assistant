@@ -6,9 +6,9 @@ from typing import ClassVar
 
 from arq.connections import RedisSettings
 
-from case_assistant_api.config import get_settings
-from case_assistant_api.domains.jobs.store import get_job_store
-from case_assistant_api.workers.dispatch import close_arq_pool
+from email_assistant.config import get_settings
+from email_assistant.domains.jobs.store import get_job_store
+from email_assistant.workers.dispatch import close_arq_pool
 
 
 async def startup(ctx: dict[str, object]) -> None:

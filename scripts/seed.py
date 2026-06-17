@@ -1,4 +1,4 @@
-"""Seed local Postgres and search stores (run manually after Docker is up).
+"""Seed local database and search stores (run manually after Docker is up).
 
 Usage:
     uv run python scripts/seed.py
@@ -12,13 +12,13 @@ import asyncio
 
 import orjson
 import structlog
-from case_assistant_api.config import get_settings
-from case_assistant_api.db.migrations import run_migrations
-from case_assistant_api.db.pool import close_pool, get_connection, open_pool
-from case_assistant_api.domains.cases.repository import validate_identifier
-from case_assistant_api.domains.cases.schemas import CaseRecord
-from case_assistant_api.domains.rag.indexer import EvidenceIndexService
-from case_assistant_api.domains.rag.retriever import Evidence
+from email_assistant.config import get_settings
+from email_assistant.db.migrations import run_migrations
+from email_assistant.db.pool import close_pool, get_connection, is_sqlite_mode, open_pool
+from email_assistant.domains.cases.repository import validate_identifier
+from email_assistant.domains.cases.schemas import CaseRecord
+from email_assistant.domains.rag.indexer import EvidenceIndexService
+from email_assistant.domains.rag.retriever import Evidence
 
 logger = structlog.get_logger()
 
@@ -104,7 +104,7 @@ def dev_evidence() -> list[Evidence]:
     return [Evidence.model_validate(item) for item in raw if isinstance(item, dict)]
 
 
-async def seed_postgres() -> int:
+async def seed_database() -> int:
     settings = get_settings()
     table_name = validate_identifier(settings.case_table_name)
     cases = dev_cases()
@@ -114,30 +114,51 @@ async def seed_postgres() -> int:
         async with get_connection() as connection:
             for case_id, record in cases.items():
                 payload_json = orjson.dumps(record.model_dump()).decode()
-                await connection.execute(
-                    f"""
-                    INSERT INTO {table_name}
-                        (case_id, issue_type, customer_tier, payload, created_at, updated_at)
-                    VALUES ($1, $2, $3, $4::jsonb, now(), now())
-                    ON CONFLICT (case_id) DO UPDATE
-                    SET issue_type = EXCLUDED.issue_type,
-                        customer_tier = EXCLUDED.customer_tier,
-                        payload = EXCLUDED.payload,
-                        updated_at = now()
-                    """,
-                    case_id,
-                    record.issue_type,
-                    record.customer_tier,
-                    payload_json,
-                )
+                if is_sqlite_mode():
+                    await connection.execute(
+                        f"""
+                        INSERT INTO {table_name}
+                            (case_id, issue_type, customer_tier, payload, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))
+                        ON CONFLICT (case_id) DO UPDATE SET
+                            issue_type = excluded.issue_type,
+                            customer_tier = excluded.customer_tier,
+                            payload = excluded.payload,
+                            updated_at = datetime('now')
+                        """,
+                        case_id,
+                        record.issue_type,
+                        record.customer_tier,
+                        payload_json,
+                    )
+                else:
+                    await connection.execute(
+                        f"""
+                        INSERT INTO {table_name}
+                            (case_id, issue_type, customer_tier, payload, created_at, updated_at)
+                        VALUES ($1, $2, $3, $4::jsonb, now(), now())
+                        ON CONFLICT (case_id) DO UPDATE
+                        SET issue_type = EXCLUDED.issue_type,
+                            customer_tier = EXCLUDED.customer_tier,
+                            payload = EXCLUDED.payload,
+                            updated_at = now()
+                        """,
+                        case_id,
+                        record.issue_type,
+                        record.customer_tier,
+                        payload_json,
+                    )
     finally:
         await close_pool()
-    logger.info("postgres_seed_complete", case_count=len(cases))
+    logger.info("database_seed_complete", case_count=len(cases))
     return len(cases)
 
 
 async def seed_search() -> int:
     settings = get_settings()
+    if settings.rag_backend.lower() in {"none", "off", ""}:
+        print("RAG_BACKEND is none — skipping search store seeding.")
+        return 0
     results = await EvidenceIndexService(settings).index_evidence(dev_evidence())
     exit_code = 0
     for result in results:
@@ -150,8 +171,9 @@ async def seed_search() -> int:
 
 
 async def main() -> int:
-    case_count = await seed_postgres()
-    print(f"Seeded {case_count} cases into PostgreSQL.")
+    case_count = await seed_database()
+    db_type = "SQLite" if is_sqlite_mode() else "PostgreSQL"
+    print(f"Seeded {case_count} cases into {db_type}.")
     return await seed_search()
 
 
