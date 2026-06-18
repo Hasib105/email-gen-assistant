@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 from email_assistant.agents.emails import build_advanced_prompt, build_naive_prompt
 from email_assistant.config import Settings
 

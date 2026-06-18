@@ -1,0 +1,24 @@
+model,scenario,intent,tone,fact_recall,tone_alignment,clarity_conciseness,overall
+OpenAI gpt-oss 120b + Advanced,scenario_01,Follow up after a networking event,professional,1.0,0.5,1.0,0.8333
+OpenAI gpt-oss 120b + Advanced,scenario_02,Request budget approval for Q3 marketing campaign,formal,1.0,0.625,1.0,0.875
+OpenAI gpt-oss 120b + Advanced,scenario_03,Invite colleague to team lunch,casual,0.6666666666666666,0.5,1.0,0.7222
+OpenAI gpt-oss 120b + Advanced,scenario_04,Notify team of critical production issue,urgent,0.6666666666666666,0.3333333333333333,0.948076923076923,0.6494
+OpenAI gpt-oss 120b + Advanced,scenario_05,Respond to customer complaint about delayed shipment,empathetic,1.0,0.125,1.0,0.7083
+OpenAI gpt-oss 120b + Advanced,scenario_06,Propose a new remote work policy,professional,1.0,0.625,0.975,0.8667
+OpenAI gpt-oss 120b + Advanced,scenario_07,Follow up on an unpaid invoice,professional,1.0,0.375,1.0,0.7917
+OpenAI gpt-oss 120b + Advanced,scenario_08,Congratulate team on successful product launch,enthusiastic,1.0,0.25,1.0,0.75
+OpenAI gpt-oss 120b + Advanced,scenario_09,Request meeting to discuss partnership opportunity,formal,1.0,0.25,1.0,0.75
+OpenAI gpt-oss 120b + Advanced,scenario_10,Apologize for a service outage affecting customers,empathetic,1.0,0.375,1.0,0.7917
+MiniMax M3 + Naive,scenario_01,Follow up after a networking event,professional,1.0,0.5,1.0,0.8333
+MiniMax M3 + Naive,scenario_02,Request budget approval for Q3 marketing campaign,formal,0.6666666666666666,0.5,1.0,0.7222
+MiniMax M3 + Naive,scenario_03,Invite colleague to team lunch,casual,0.6666666666666666,0.3,0.98,0.6489
+MiniMax M3 + Naive,scenario_04,Notify team of critical production issue,urgent,1.0,0.1111111111111111,0.9447368421052631,0.6853
+MiniMax M3 + Naive,scenario_05,Respond to customer complaint about delayed shipment,empathetic,1.0,0.5,1.0,0.8333
+MiniMax M3 + Naive,scenario_06,Propose a new remote work policy,professional,1.0,0.5,1.0,0.8333
+MiniMax M3 + Naive,scenario_07,Follow up on an unpaid invoice,professional,1.0,0.625,1.0,0.875
+MiniMax M3 + Naive,scenario_08,Congratulate team on successful product launch,enthusiastic,1.0,0.625,1.0,0.875
+MiniMax M3 + Naive,scenario_09,Request meeting to discuss partnership opportunity,formal,0.6666666666666666,0.25,1.0,0.6389
+MiniMax M3 + Naive,scenario_10,Apologize for a service outage affecting customers,empathetic,0.0,0.0,0.0,0.0
+
+OpenAI gpt-oss 120b + Advanced,,,AVG,0.9333,0.3958,0.9923,0.7738
+MiniMax M3 + Naive,,,AVG,0.8,0.3911,0.8925,0.6945

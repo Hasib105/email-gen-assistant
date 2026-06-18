@@ -9,7 +9,7 @@ Flow:
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import NotRequired, TypedDict, cast
 
 from langgraph.graph import END, START, StateGraph
 
@@ -19,18 +19,18 @@ from email_assistant.agents.emails import (
 )
 from email_assistant.agents.llm import get_llm
 from email_assistant.agents.schema import EmailDraft
-from email_assistant.config import Settings, get_settings
+from email_assistant.config import get_settings
 from email_assistant.evaluation.metrics import (
     ClarityConcisenessMetric,
     FactRecallMetric,
     ToneAlignmentMetric,
 )
 
-
 # ── State ────────────────────────────────────────────────────────────────────
 
-class EmailState(TypedDict, total=False):
-    # Input
+
+class EmailState(TypedDict):
+    # Input (always present)
     intent: str
     key_facts: list[str]
     tone: str
@@ -38,18 +38,18 @@ class EmailState(TypedDict, total=False):
     strategy: str  # "advanced" or "naive"
 
     # Intermediate
-    retry_count: int
-    tone_feedback: str
-    fact_feedback: str
+    retry_count: NotRequired[int]
+    tone_feedback: NotRequired[str]
+    fact_feedback: NotRequired[str]
 
     # Output
-    subject: str
-    body: str
-    tone_score: float
-    fact_score: float
-    clarity_score: float
-    warnings: list[str]
-    passed: bool
+    subject: NotRequired[str]
+    body: NotRequired[str]
+    tone_score: NotRequired[float]
+    fact_score: NotRequired[float]
+    clarity_score: NotRequired[float]
+    warnings: NotRequired[list[str]]
+    passed: NotRequired[bool]
 
 
 MAX_RETRIES = 2
@@ -73,14 +73,18 @@ def generate_email(state: EmailState) -> dict:
         extra += f"\nFACT FEEDBACK: {fact_fb}"
 
     if state.get("strategy") == "naive":
-        prompt = build_naive_prompt(intent=state["intent"], key_facts=state["key_facts"], tone=state["tone"])
+        prompt = build_naive_prompt(
+            intent=state["intent"], key_facts=state["key_facts"], tone=state["tone"]
+        )
     else:
-        prompt = build_advanced_prompt(intent=state["intent"], key_facts=state["key_facts"], tone=state["tone"])
+        prompt = build_advanced_prompt(
+            intent=state["intent"], key_facts=state["key_facts"], tone=state["tone"]
+        )
 
     if extra:
         prompt += f"\n\nIMPORTANT FIXES FOR NEXT ATTEMPT:{extra}"
 
-    result = structured_llm.invoke(prompt)
+    result = cast("EmailDraft", structured_llm.invoke(prompt))
 
     return {
         "subject": result.subject,
@@ -92,7 +96,8 @@ def generate_email(state: EmailState) -> dict:
 def validate_tone(state: EmailState) -> dict:
     """Check tone alignment. Return score and feedback if failing."""
     metric = ToneAlignmentMetric()
-    result = metric.evaluate(state["tone"], state["body"])
+    body = state.get("body", "")
+    result = metric.evaluate(state["tone"], body)
 
     if result.score >= 0.5:
         return {"tone_score": result.score, "tone_feedback": ""}
@@ -108,7 +113,8 @@ def validate_tone(state: EmailState) -> dict:
 def validate_facts(state: EmailState) -> dict:
     """Check fact recall. Return score and feedback if failing."""
     metric = FactRecallMetric()
-    result = metric.evaluate(state["key_facts"], state["body"])
+    body = state.get("body", "")
+    result = metric.evaluate(state["key_facts"], body)
 
     if result.score >= 0.5:
         return {"fact_score": result.score, "fact_feedback": ""}
@@ -126,13 +132,17 @@ def validate_facts(state: EmailState) -> dict:
 
 def finalize(state: EmailState) -> dict:
     """Compute clarity score, assemble warnings, determine pass/fail."""
-    clarity = ClarityConcisenessMetric().evaluate(state["subject"], state["body"])
+    subject = state.get("subject", "")
+    body = state.get("body", "")
+    clarity = ClarityConcisenessMetric().evaluate(subject, body)
 
     warnings: list[str] = []
-    if state.get("tone_score", 1.0) < 0.5:
-        warnings.append(f"Tone alignment low ({state['tone_score']:.2f})")
-    if state.get("fact_score", 1.0) < 0.5:
-        warnings.append(f"Fact recall low ({state['fact_score']:.2f})")
+    tone_score = state.get("tone_score", 1.0)
+    fact_score = state.get("fact_score", 1.0)
+    if tone_score < 0.5:
+        warnings.append(f"Tone alignment low ({tone_score:.2f})")
+    if fact_score < 0.5:
+        warnings.append(f"Fact recall low ({fact_score:.2f})")
     if clarity.score < 0.5:
         warnings.append(f"Clarity low ({clarity.score:.2f})")
 
@@ -221,6 +231,12 @@ def generate_with_guardrails(
 
     state = graph.invoke(initial)
 
+    # Reconstruct the prompt for output
+    if strategy == "naive":
+        prompt_template = build_naive_prompt(intent=intent, key_facts=key_facts, tone=tone)
+    else:
+        prompt_template = build_advanced_prompt(intent=intent, key_facts=key_facts, tone=tone)
+
     return {
         "subject": state.get("subject", ""),
         "body": state.get("body", ""),
@@ -230,4 +246,5 @@ def generate_with_guardrails(
         "warnings": state.get("warnings", []),
         "passed": state.get("passed", False),
         "retries": state.get("retry_count", 0),
+        "prompt_template": prompt_template,
     }

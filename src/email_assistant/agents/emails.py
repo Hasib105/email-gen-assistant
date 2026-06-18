@@ -5,13 +5,11 @@ from __future__ import annotations
 import time
 from typing import cast
 
-from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 
 from email_assistant.agents.llm import get_llm
 from email_assistant.agents.schema import EmailDraft
 from email_assistant.config import Settings, get_settings
-
 
 # ── Advanced Prompt (Strategy A) ────────────────────────────────────────────
 

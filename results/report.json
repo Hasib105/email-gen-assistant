@@ -1,0 +1,698 @@
+{
+  "metric_definitions": {
+    "fact_recall": {
+      "name": "Fact Recall Score",
+      "description": "Whether all input facts appear in the output.",
+      "scoring": "0.0-1.0"
+    },
+    "tone_alignment": {
+      "name": "Tone Alignment Score",
+      "description": "Whether the email matches the requested tone.",
+      "scoring": "0.0-1.0"
+    },
+    "clarity_conciseness": {
+      "name": "Clarity & Conciseness Score",
+      "description": "Readability, appropriate length, no redundancy.",
+      "scoring": "0.0-1.0"
+    }
+  },
+  "model_a": {
+    "name": "OpenAI gpt-oss 120b + Advanced",
+    "model": "openai/gpt-oss-120b",
+    "strategy": "advanced"
+  },
+  "model_b": {
+    "name": "MiniMax M3 + Naive",
+    "model": "minimaxai/minimax-m3",
+    "strategy": "naive"
+  },
+  "model_a_results": [
+    {
+      "scenario_id": "scenario_01",
+      "intent": "Follow up after a networking event",
+      "tone": "professional",
+      "key_facts": [
+        "Met at Tech Conference 2026",
+        "Discussed potential collaboration on AI project",
+        "Available for coffee chat next week"
+      ],
+      "generated_subject": "Follow‑up from Tech Conference 2026 – AI Collaboration Discussion",
+      "generated_body": "Dear [Recipient’s Name],\n\nIt was a pleasure meeting you at Tech Conference 2026 and learning more about your work in artificial intelligence. I enjoyed our conversation about a potential collaboration on the AI project you outlined, and I’m enthusiastic about exploring how our teams might combine expertise to accelerate development.\n\nIf you’re available, I would welcome the opportunity to continue our discussion over coffee next week. I’m free on Tuesday (June 25) or Thursday (June 27) between 10:00 AM and 2:00 PM, but I’m happy to accommodate a time that works best for you.\n\nPlease let me know which slot fits your schedule, or suggest an alternative, and I’ll arrange the details.\n\nLooking forward to the possibility of working together.\n\nBest regards,\n[Your Full Name]\n[Your Title]\n[Your Company]\n[Phone Number]\n[Email Address]\n",
+      "reference_subject": "Great Meeting You at Tech Conference 2026",
+      "reference_body": "Dear Alex,\n\nIt was a pleasure meeting you at Tech Conference 2026 last week. I truly enjoyed our conversation about the potential collaboration on the AI project we discussed.\n\nI believe there is strong alignment between our teams, and I would welcome the opportunity to explore this further. I am available for a coffee chat next week at your convenience — perhaps Tuesday or Wednesday afternoon?\n\nLooking forward to continuing our discussion.\n\nBest regards,\nJordan",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Follow up after a networking event\nKey Facts:\n- Met at Tech Conference 2026\n- Discussed potential collaboration on AI project\n- Available for coffee chat next week\nTone: professional\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Met at Tech Conference 2026' -> FOUND (67%)\n  'Discussed potential collaboration on AI project' -> FOUND (75%)\n  'Available for coffee chat next week' -> FOUND (83%)"
+        },
+        "tone_alignment": {
+          "score": 0.5,
+          "details": "Matched: ['regards', 'opportunity', 'discuss', 'looking forward']\nContradictions: []\nScore: 0.50"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 19.0 words/sentence -> 1.00\nLength: 133 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 9 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_02",
+      "intent": "Request budget approval for Q3 marketing campaign",
+      "tone": "formal",
+      "key_facts": [
+        "Campaign budget is $50,000",
+        "Expected ROI is 3x",
+        "Targets 10,000 new leads"
+      ],
+      "generated_subject": "Budget Approval Request — Q3 Marketing Campaign",
+      "generated_body": "Dear [Recipient],\n\nI am writing to seek your approval for the budget allocation required for our Q3 marketing campaign.\n\nThe initiative calls for a total investment of $50,000. Based on our projections, the campaign is expected to generate a return on investment of 3 × within the quarter and to capture approximately 10,000 new qualified leads, thereby strengthening our sales pipeline considerably.\n\nAttached you will find the detailed campaign plan, financial model, and ROI analysis for your review. I would be happy to discuss any aspect of the proposal at your convenience.\n\nThank you for considering this request. I look forward to your favorable response.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Your Contact Information]\n",
+      "reference_subject": "Q3 Marketing Campaign — Budget Approval Request",
+      "reference_body": "Dear Ms. Chen,\n\nI am writing to formally request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000. Based on our market analysis and historical performance data, we project a return on investment of 3x within the quarter. This initiative is expected to generate approximately 10,000 new qualified leads.\n\nI have attached the detailed campaign plan and financial projections for your review.\n\nThank you for your consideration.\n\nSincerely,\nMarketing Department",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts:\n- Campaign budget is $50,000\n- Expected ROI is 3x\n- Targets 10,000 new leads\nTone: formal\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Campaign budget is $50,000' -> FOUND (100%)\n  'Expected ROI is 3x' -> FOUND (100%)\n  'Targets 10,000 new leads' -> FOUND (67%)"
+        },
+        "tone_alignment": {
+          "score": 0.625,
+          "details": "Matched: ['dear', 'request', 'hereby', 'for your review', 'at your convenience']\nContradictions: []\nScore: 0.62"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 14.2 words/sentence -> 1.00\nLength: 114 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 7 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_03",
+      "intent": "Invite colleague to team lunch",
+      "tone": "casual",
+      "key_facts": [
+        "New Italian restaurant downtown",
+        "Friday at noon",
+        "Celebrating project completion"
+      ],
+      "generated_subject": "Team lunch this Friday?",
+      "generated_body": "Hey [Name],\n\nJust wanted to let you know there’s a brand‑new Italian spot downtown that looks awesome. How about we hit it up this Friday at noon to celebrate wrapping up the project? It’ll be a great chance to relax and grab some good food together.\n\nLet me know if you can make it!\n\nCheers,\n[Your Name]",
+      "reference_subject": "Team lunch this Friday?",
+      "reference_body": "Hey Sam!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\nAlex",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Invite colleague to team lunch\nKey Facts:\n- New Italian restaurant downtown\n- Friday at noon\n- Celebrating project completion\nTone: casual\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 0.6666666666666666,
+          "details": "Recalled 2/3 facts.\n  'New Italian restaurant downtown' -> FOUND (75%)\n  'Friday at noon' -> FOUND (100%)\n  'Celebrating project completion' -> MISSING (33%)"
+        },
+        "tone_alignment": {
+          "score": 0.5,
+          "details": "Matched: ['hey', 'hi', 'awesome', 'let me know', 'cheers']\nContradictions: []\nScore: 0.50"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 11.4 words/sentence -> 1.00\nLength: 57 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 4 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_04",
+      "intent": "Notify team of critical production issue",
+      "tone": "urgent",
+      "key_facts": [
+        "Payment service is down",
+        "Affecting 30% of transactions",
+        "Need all hands on deck"
+      ],
+      "generated_subject": "URGENT: Payment Service Outage — Immediate Action Required",
+      "generated_body": "Team,\n\nOur payment service is currently down, impacting roughly 30% of all transactions. This is a critical production issue that requires every available engineer to engage immediately.\n\n**Action required now:**\n1. Join the incident bridge on Zoom at **[link]** – do not wait.\n2. Prioritize this outage above all other work.\n3. Begin troubleshooting the payment gateway and database connectivity as outlined in the run‑book (attached).\n4. Post hourly updates in the #incident channel.\n\nThe situation will remain our top priority until full restoration. Do not hesitate to reach out to the incident commander, **[Name]**, for any blockers.\n\n[Your Name]\n[Title]\n[Contact Information]",
+      "reference_subject": "URGENT: Payment Service Outage — Immediate Action Required",
+      "reference_body": "Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks.\n\nThis is our top priority.\n\nEngineering Lead",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Notify team of critical production issue\nKey Facts:\n- Payment service is down\n- Affecting 30% of transactions\n- Need all hands on deck\nTone: urgent\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 0.6666666666666666,
+          "details": "Recalled 2/3 facts.\n  'Payment service is down' -> FOUND (100%)\n  'Affecting 30% of transactions' -> FOUND (50%)\n  'Need all hands on deck' -> MISSING (25%)"
+        },
+        "tone_alignment": {
+          "score": 0.3333333333333333,
+          "details": "Matched: ['immediately', 'critical', 'priority']\nContradictions: []\nScore: 0.33"
+        },
+        "clarity_conciseness": {
+          "score": 0.948076923076923,
+          "details": "Readability: 7.9 words/sentence -> 0.79\nLength: 103 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 8 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.33)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_05",
+      "intent": "Respond to customer complaint about delayed shipment",
+      "tone": "empathetic",
+      "key_facts": [
+        "Order was delayed by 2 weeks",
+        "Full refund is being processed",
+        "Improved logistics measures are in place"
+      ],
+      "generated_subject": "Our Apologies — Update on Your Order",
+      "generated_body": "Dear [Customer Name],\n\nI’m truly sorry for the inconvenience you’ve experienced with the recent delay of your order. I understand how disappointing it is to wait two weeks beyond the expected delivery date, and I appreciate your patience.\n\nPlease know that we have already processed a full refund for your purchase, which should appear in your account within 3–5 business days. In addition, we have put new logistics measures in place to ensure faster and more reliable deliveries moving forward.\n\nYour satisfaction is incredibly important to us, and we are committed to making this right. If there’s anything else I can do for you, or if you have any further questions, please don’t hesitate to reach out.\n\nWith sincere apologies,\n\n[Your Name]\n[Your Title]\n[Company Name]\n[Contact Information]",
+      "reference_subject": "We're Sorry — Your Order Update and Refund",
+      "reference_body": "Dear Sarah,\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour full refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\nCustomer Support Team",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts:\n- Order was delayed by 2 weeks\n- Full refund is being processed\n- Improved logistics measures are in place\nTone: empathetic\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Order was delayed by 2 weeks' -> FOUND (50%)\n  'Full refund is being processed' -> FOUND (75%)\n  'Improved logistics measures are in place' -> FOUND (80%)"
+        },
+        "tone_alignment": {
+          "score": 0.125,
+          "details": "Matched: ['understand']\nContradictions: []\nScore: 0.12"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 18.3 words/sentence -> 1.00\nLength: 128 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 7 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.12)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_06",
+      "intent": "Propose a new remote work policy",
+      "tone": "professional",
+      "key_facts": [
+        "Productivity increased 15% during remote work trial",
+        "Employee satisfaction scores improved by 20%",
+        "Office costs could be reduced by 30% with hybrid model"
+      ],
+      "generated_subject": "Proposal: Implement a New Remote Work Policy – Boosting Productivity & Reducing Costs",
+      "generated_body": "Dear [Recipient Name],\n\nI am writing to propose the adoption of a structured remote‑work policy based on the compelling results of our recent pilot program.\n\n**Key outcomes from the trial**\n- **Productivity:** Average output rose by 15% compared with pre‑remote baseline.\n- **Employee satisfaction:** Scores improved by 20%, indicating higher engagement and morale.\n- **Cost efficiency:** Transitioning to a hybrid model could lower our office‑related expenses by approximately 30% (leasing, utilities, and facilities management).\n\nThese metrics demonstrate that a flexible work arrangement not only enhances performance but also delivers significant financial benefits. I recommend formalizing a hybrid remote‑work policy that:\n1. Allows eligible employees to work remotely up to three days per week.\n2. Defines clear performance expectations and communication protocols.\n3. Provides technology and security resources to support seamless collaboration.\n\nI have attached a detailed policy draft, a cost‑benefit analysis, and an implementation timeline for your review. I would welcome the opportunity to discuss this proposal at your earliest convenience and to address any questions you may have.\n\nThank you for considering this strategic initiative.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Your Contact Information]",
+      "reference_subject": "Proposal: Hybrid Remote Work Policy",
+      "reference_body": "Dear Leadership Team,\n\nI am writing to propose the adoption of a hybrid remote work policy based on the results of our recent trial period.\n\nDuring the remote work trial, we observed a 15% increase in overall productivity and a 20% improvement in employee satisfaction scores. Additionally, transitioning to a hybrid model would allow us to reduce office-related costs by approximately 30%.\n\nI recommend a structured approach: three days remote, two days in-office.\n\nBest regards,\nHR Director",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Propose a new remote work policy\nKey Facts:\n- Productivity increased 15% during remote work trial\n- Employee satisfaction scores improved by 20%\n- Office costs could be reduced by 30% with hybrid model\nTone: professional\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Productivity increased 15% during remote work tria' -> FOUND (67%)\n  'Employee satisfaction scores improved by 20%' -> FOUND (100%)\n  'Office costs could be reduced by 30% with hybrid m' -> FOUND (71%)"
+        },
+        "tone_alignment": {
+          "score": 0.625,
+          "details": "Matched: ['regards', 'opportunity', 'discuss', 'review', 'thank you']\nContradictions: []\nScore: 0.62"
+        },
+        "clarity_conciseness": {
+          "score": 0.975,
+          "details": "Readability: 12.3 words/sentence -> 1.00\nLength: 185 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 13 words -> 0.90"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_07",
+      "intent": "Follow up on an unpaid invoice",
+      "tone": "professional",
+      "key_facts": [
+        "Invoice #INV-2024-0892 is 30 days overdue",
+        "Amount owed is $4,500",
+        "Payment terms are Net 30"
+      ],
+      "generated_subject": "Reminder: Invoice #INV-2024-0892 – Payment Due",
+      "generated_body": "Dear [Recipient Name],\n\nI hope you are well. I am writing to follow up on invoice #INV-2024-0892, issued on [Invoice Date], which is now 30 days past due in accordance with our Net 30 payment terms. The outstanding amount is $4,500.\n\nWe would appreciate your prompt attention to this matter. If payment has already been processed, please disregard this reminder. Otherwise, kindly arrange for settlement by [Proposed Payment Deadline] or let us know if there are any issues we can assist with.\n\nThank you for your cooperation.\n\nSincerely,\n[Your Name]\n[Your Title]\n[Company Name]\n[Phone Number] | [Email Address]",
+      "reference_subject": "Reminder: Overdue Invoice #INV-2024-0892",
+      "reference_body": "Dear Accounts Payable,\n\nI hope this message finds you well. I am writing to follow up on invoice #INV-2024-0892, which is now 30 days past due.\n\nThe outstanding amount is $4,500 for services rendered per our agreed payment terms of Net 30. I have attached a copy of the original invoice for your reference.\n\nCould you please confirm the status of this payment?\n\nBest regards,\nFinance Team",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Follow up on an unpaid invoice\nKey Facts:\n- Invoice #INV-2024-0892 is 30 days overdue\n- Amount owed is $4,500\n- Payment terms are Net 30\nTone: professional\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Invoice #INV-2024-0892 is 30 days overdue' -> FOUND (75%)\n  'Amount owed is $4,500' -> FOUND (50%)\n  'Payment terms are Net 30' -> FOUND (100%)"
+        },
+        "tone_alignment": {
+          "score": 0.375,
+          "details": "Matched: ['sincerely', 'appreciate', 'thank you']\nContradictions: []\nScore: 0.38"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 12.4 words/sentence -> 1.00\nLength: 99 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 6 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.38)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_08",
+      "intent": "Congratulate team on successful product launch",
+      "tone": "enthusiastic",
+      "key_facts": [
+        "Product launched on schedule",
+        "First week sales exceeded targets by 40%",
+        "Customer feedback has been overwhelmingly positive"
+      ],
+      "generated_subject": "🎉 We Did It! Outstanding Launch Success 🎉",
+      "generated_body": "Dear Team,\n\nI’m thrilled to announce that our product launch not only hit the schedule — it smashed it! In just the first week we exceeded our sales target by a whopping 40%, and the customer feedback has been nothing short of spectacular.\n\nYour dedication, creativity, and unstoppable energy made this achievement possible. Every late‑night brainstorm, every meticulous test, and every enthusiastic shout‑out on the floor has paid off in a big way.\n\nLet’s keep this momentum soaring as we move to the next phase. Celebrate this win, share the pride, and get ready for even more amazing milestones together!\n\nThank you for being extraordinary.\n\nOnward and upward,\n\n[Your Name]",
+      "reference_subject": "Incredible Launch — You All Made It Happen!",
+      "reference_body": "Hi Team,\n\nI wanted to take a moment to congratulate each and every one of you on an absolutely phenomenal product launch!\n\nWe hit our launch date on schedule, and the results speak for themselves: first week sales have exceeded our targets by an impressive 40%. The customer feedback we've received has been overwhelmingly positive.\n\nThis achievement is a testament to your hard work and dedication.\n\nWith gratitude,\nProduct Lead",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Congratulate team on successful product launch\nKey Facts:\n- Product launched on schedule\n- First week sales exceeded targets by 40%\n- Customer feedback has been overwhelmingly positive\nTone: enthusiastic\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Product launched on schedule' -> FOUND (67%)\n  'First week sales exceeded targets by 40%' -> FOUND (80%)\n  'Customer feedback has been overwhelmingly positive' -> FOUND (67%)"
+        },
+        "tone_alignment": {
+          "score": 0.25,
+          "details": "Matched: ['amazing', 'thrilled']\nContradictions: []\nScore: 0.25"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 13.8 words/sentence -> 1.00\nLength: 110 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 8 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.25)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_09",
+      "intent": "Request meeting to discuss partnership opportunity",
+      "tone": "formal",
+      "key_facts": [
+        "Potential partnership between TechCo and InnovateLab",
+        "Synergies in AI and machine learning capabilities",
+        "Target timeline is Q4 2026"
+      ],
+      "generated_subject": "Request for Meeting – Potential TechCo & InnovateLab Partnership",
+      "generated_body": "Dear [Recipient Name],\n\nI hope this message finds you well. I am reaching out to propose a meeting to discuss a prospective partnership between TechCo and InnovateLab. Both organizations possess complementary strengths in artificial intelligence and machine learning, creating a compelling opportunity to combine our respective expertise.\n\nWe have identified several strategic synergies that could accelerate product development, expand market reach, and drive mutual growth. To align our efforts, we are targeting a collaborative rollout in Q4 2026.\n\nCould we schedule a discussion at your earliest convenience to review the partnership framework and outline next steps? I am available next week on Tuesday (June 23) and Thursday (June 25) between 10:00 a.m. and 2:00 p.m., but I am happy to accommodate an alternative time that better fits your schedule.\n\nThank you for considering this opportunity. I look forward to the prospect of working together.\n\nSincerely,\n\n[Your Full Name]\n[Your Title]\nTechCo\n[Phone Number]\n[Email Address]",
+      "reference_subject": "Partnership Discussion — TechCo and InnovateLab",
+      "reference_body": "Dear Dr. Williams,\n\nI hope this letter finds you well. I am writing on behalf of TechCo to explore a potential partnership with InnovateLab.\n\nOur analysis has identified significant synergies between our respective AI and machine learning capabilities. We are targeting Q4 2026 for any formalized arrangement.\n\nWould you be available for an introductory call during the week of June 23rd?\n\nKind regards,\nVP of Business Development\nTechCo",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Request meeting to discuss partnership opportunity\nKey Facts:\n- Potential partnership between TechCo and InnovateLab\n- Synergies in AI and machine learning capabilities\n- Target timeline is Q4 2026\nTone: formal\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Potential partnership between TechCo and InnovateL' -> FOUND (83%)\n  'Synergies in AI and machine learning capabilities' -> FOUND (80%)\n  'Target timeline is Q4 2026' -> FOUND (50%)"
+        },
+        "tone_alignment": {
+          "score": 0.25,
+          "details": "Matched: ['dear', 'sincerely']\nContradictions: []\nScore: 0.25"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 11.3 words/sentence -> 1.00\nLength: 155 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 9 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.25)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_10",
+      "intent": "Apologize for a service outage affecting customers",
+      "tone": "empathetic",
+      "key_facts": [
+        "Database outage lasted 4 hours yesterday",
+        "Root cause was a failed migration script",
+        "Monitoring and safeguards have been improved"
+      ],
+      "generated_subject": "We’re Sorry — Update on Yesterday’s Service Outage",
+      "generated_body": "Dear Valued Customer,\n\nI want to extend our sincere apologies for the disruption you experienced yesterday when our database was unavailable for four hours. We understand how frustrating it is to be unable to access the service you rely on, and we deeply regret any inconvenience this caused.\n\nOur investigation revealed that the outage was triggered by a failed migration script during a routine update. While the script was intended to improve performance, it unintentionally caused the database to become inaccessible.\n\nPlease rest assured that we have taken immediate corrective actions. We have strengthened our monitoring systems and added additional safeguards to detect and halt any similar issues before they impact you. These enhancements are designed to prevent a recurrence and to restore confidence in the reliability of our service.\n\nYour experience matters to us, and we are committed to learning from this incident to serve you better. If you have any questions or need further assistance, please do not hesitate to reach out to our support team at support@example.com or call 1‑800‑555‑0199.\n\nThank you for your understanding and continued trust.\n\nWith sincere apologies,\n[Your Name]\n[Your Title]\n[Company Name]",
+      "reference_subject": "Our Apology — Yesterday's Service Disruption",
+      "reference_body": "Dear Valued Customer,\n\nI am writing to personally apologize for the service disruption you experienced yesterday. Our database was unavailable for approximately four hours, and I understand how frustrating this was for you.\n\nThe root cause was a failed migration script. We have implemented enhanced monitoring systems and additional safeguards to prevent this from happening again.\n\nWe value your trust in our platform.\n\nWith sincere apologies,\nCTO",
+      "prompt_template": "You are a world-class professional email writer with 15 years of experience\nin corporate communications. You craft emails that are clear, persuasive, and perfectly\ntailored to the requested tone. Your emails always have a compelling subject line and\nwell-structured body that achieves the stated intent.\n\nBefore writing the email, think through these steps:\n1. UNDERSTAND the intent: What is the primary goal of this email?\n2. ORGANIZE the facts: Which key facts are most relevant and in what order?\n3. MATCH the tone: How should the language, sentence structure, and word choice reflect the requested tone?\n4. CRAFT the subject: What subject line will grab attention and reflect the email's purpose?\n5. WRITE the body: Compose a well-structured email that flows naturally and achieves the intent.\n\nOutput ONLY the final email with Subject and Body. No explanations.\n\n\nEXAMPLE 1 — Formal:\nIntent: Request budget approval for Q3 marketing campaign\nKey Facts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: Formal\n\nSubject: Budget Approval Request — Q3 Marketing Campaign\nBody: Dear [Recipient],\n\nI am writing to request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000, with a projected return on investment of 3x within the quarter. Our analysis indicates this initiative will generate approximately 10,000 new qualified leads, significantly expanding our customer pipeline.\n\nI have attached the detailed campaign plan and financial projections for your review. I am available to discuss this further at your earliest convenience.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n\n---\n\nEXAMPLE 2 — Casual:\nIntent: Invite colleague to team lunch\nKey Facts: New Italian restaurant downtown, Friday at noon, celebrating project completion\nTone: Casual\n\nSubject: Team lunch this Friday?\nBody: Hey!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\n[Your Name]\n\n---\n\nEXAMPLE 3 — Urgent:\nIntent: Notify team of critical production issue\nKey Facts: Payment service is down, affecting 30% of transactions, need all hands on deck\nTone: Urgent\n\nSubject: URGENT: Payment Service Outage — Immediate Action Required\nBody: Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks. I will provide updates every 15 minutes until resolution.\n\nThis is our top priority.\n\n[Your Name]\n\n---\n\nEXAMPLE 4 — Empathetic:\nIntent: Respond to customer complaint about delayed shipment\nKey Facts: Order was delayed by 2 weeks, refund processing, improved logistics in place\nTone: Empathetic\n\nSubject: We're Sorry — Your Order Update\nBody: Dear [Customer],\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\n[Your Name]\n\n\n---\n\nNOW WRITE THIS EMAIL:\nIntent: Apologize for a service outage affecting customers\nKey Facts:\n- Database outage lasted 4 hours yesterday\n- Root cause was a failed migration script\n- Monitoring and safeguards have been improved\nTone: empathetic\n\nEmail:",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Database outage lasted 4 hours yesterday' -> FOUND (80%)\n  'Root cause was a failed migration script' -> FOUND (83%)\n  'Monitoring and safeguards have been improved' -> FOUND (67%)"
+        },
+        "tone_alignment": {
+          "score": 0.375,
+          "details": "Matched: ['understand', 'value', 'trust']\nContradictions: []\nScore: 0.38"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 15.9 words/sentence -> 1.00\nLength: 190 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 8 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.38)",
+        "Max retries (2) reached — review manually"
+      ]
+    }
+  ],
+  "model_b_results": [
+    {
+      "scenario_id": "scenario_01",
+      "intent": "Follow up after a networking event",
+      "tone": "professional",
+      "key_facts": [
+        "Met at Tech Conference 2026",
+        "Discussed potential collaboration on AI project",
+        "Available for coffee chat next week"
+      ],
+      "generated_subject": "Following Up After Tech Conference 2026",
+      "generated_body": "Hi [Name],\n\nIt was great meeting you at Tech Conference 2026. I really enjoyed our conversation about [specific topic discussed], and I appreciate you sharing your insights on [any particular point they made].\n\nAs I mentioned, I'm very interested in exploring the possibility of collaborating on [AI project/initiative]. I think there could be some valuable synergies between our work, and I'd love to discuss how we might move forward together.\n\nWould you be available for a coffee chat sometime next week? I'm happy to work around your schedule and can meet at a location that's convenient for you. Please let me know what day and time work best, and I'll make the arrangements.\n\nIn the meantime, feel free to connect with me on [LinkedIn/other platform] if you haven't already, and don't hesitate to reach out if you have any preliminary thoughts on the collaboration.\n\nLooking forward to staying in touch and hopefully meeting up soon.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Your Company]\n[Your Phone Number]\n[Your Email]",
+      "reference_subject": "Great Meeting You at Tech Conference 2026",
+      "reference_body": "Dear Alex,\n\nIt was a pleasure meeting you at Tech Conference 2026 last week. I truly enjoyed our conversation about the potential collaboration on the AI project we discussed.\n\nI believe there is strong alignment between our teams, and I would welcome the opportunity to explore this further. I am available for a coffee chat next week at your convenience — perhaps Tuesday or Wednesday afternoon?\n\nLooking forward to continuing our discussion.\n\nBest regards,\nJordan",
+      "prompt_template": "Write an email.\nIntent: Follow up after a networking event\nFacts: Met at Tech Conference 2026, Discussed potential collaboration on AI project, Available for coffee chat next week\nTone: professional",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Met at Tech Conference 2026' -> FOUND (100%)\n  'Discussed potential collaboration on AI project' -> FOUND (75%)\n  'Available for coffee chat next week' -> FOUND (100%)"
+        },
+        "tone_alignment": {
+          "score": 0.5,
+          "details": "Matched: ['regards', 'appreciate', 'discuss', 'looking forward']\nContradictions: []\nScore: 0.50"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 16.8 words/sentence -> 1.00\nLength: 168 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 6 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_02",
+      "intent": "Request budget approval for Q3 marketing campaign",
+      "tone": "formal",
+      "key_facts": [
+        "Campaign budget is $50,000",
+        "Expected ROI is 3x",
+        "Targets 10,000 new leads"
+      ],
+      "generated_subject": "Request for Budget Approval – Q3 Marketing Campaign",
+      "generated_body": "Dear [Approver's Name],\n\nI hope this message finds you well. I am writing to formally request your approval for the budget allocation of our Q3 marketing campaign.\n\nThe proposed campaign budget is $50,000. Based on our preliminary projections and historical performance data, we anticipate a return on investment of approximately 3x, along with the acquisition of 10,000 new leads. We believe this initiative represents a strong opportunity to drive meaningful growth and contribute to our quarterly targets.\n\nI have attached a detailed breakdown of the proposed expenditure, along with supporting analytics and projected outcomes for your review. I would be happy to walk through any aspects of the plan at your convenience.\n\nThank you for your time and consideration. Please let me know if you require any additional information to proceed with the approval.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Your Department]\n[Your Contact Information]",
+      "reference_subject": "Q3 Marketing Campaign — Budget Approval Request",
+      "reference_body": "Dear Ms. Chen,\n\nI am writing to formally request your approval for the Q3 marketing campaign budget allocation.\n\nThe proposed campaign requires an investment of $50,000. Based on our market analysis and historical performance data, we project a return on investment of 3x within the quarter. This initiative is expected to generate approximately 10,000 new qualified leads.\n\nI have attached the detailed campaign plan and financial projections for your review.\n\nThank you for your consideration.\n\nSincerely,\nMarketing Department",
+      "prompt_template": "Write an email.\nIntent: Request budget approval for Q3 marketing campaign\nFacts: Campaign budget is $50,000, Expected ROI is 3x, Targets 10,000 new leads\nTone: formal",
+      "metrics": {
+        "fact_recall": {
+          "score": 0.6666666666666666,
+          "details": "Recalled 2/3 facts.\n  'Campaign budget is $50,000' -> FOUND (100%)\n  'Expected ROI is 3x' -> MISSING (0%)\n  'Targets 10,000 new leads' -> FOUND (100%)"
+        },
+        "tone_alignment": {
+          "score": 0.5,
+          "details": "Matched: ['dear', 'request', 'for your review', 'at your convenience']\nContradictions: []\nScore: 0.50"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 14.5 words/sentence -> 1.00\nLength: 145 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 8 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_03",
+      "intent": "Invite colleague to team lunch",
+      "tone": "casual",
+      "key_facts": [
+        "New Italian restaurant downtown",
+        "Friday at noon",
+        "Celebrating project completion"
+      ],
+      "generated_subject": "Lunch on Friday? 🍕",
+      "generated_body": "Hey [Name],\n\nWe just wrapped up the project, so I figured we should celebrate! There's a new Italian place downtown that I've been dying to try.\n\nWant to grab lunch there this Friday at noon? My treat for the team finishing strong!\n\nLet me know if you're in!",
+      "reference_subject": "Team lunch this Friday?",
+      "reference_body": "Hey Sam!\n\nJust wanted to check — there's a new Italian place downtown that looks amazing. Want to grab lunch there this Friday around noon? We've been crushing it on the project lately and it'd be great to celebrate.\n\nLet me know if you're in!\n\nCheers,\nAlex",
+      "prompt_template": "Write an email.\nIntent: Invite colleague to team lunch\nFacts: New Italian restaurant downtown, Friday at noon, Celebrating project completion\nTone: casual",
+      "metrics": {
+        "fact_recall": {
+          "score": 0.6666666666666666,
+          "details": "Recalled 2/3 facts.\n  'New Italian restaurant downtown' -> FOUND (75%)\n  'Friday at noon' -> FOUND (100%)\n  'Celebrating project completion' -> MISSING (33%)"
+        },
+        "tone_alignment": {
+          "score": 0.3,
+          "details": "Matched: ['hey', 'hi', 'let me know']\nContradictions: []\nScore: 0.30"
+        },
+        "clarity_conciseness": {
+          "score": 0.98,
+          "details": "Readability: 9.6 words/sentence -> 0.96\nLength: 48 words -> 0.96\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 4 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.30)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_04",
+      "intent": "Notify team of critical production issue",
+      "tone": "urgent",
+      "key_facts": [
+        "Payment service is down",
+        "Affecting 30% of transactions",
+        "Need all hands on deck"
+      ],
+      "generated_subject": "🚨 CRITICAL: Payment Service Down – Immediate Action Required",
+      "generated_body": "Team,\n\nWe have a P0 production incident. The payment service is currently DOWN, and approximately 30% of transactions are failing. This requires immediate attention from all hands on deck.\n\n**Impact:**\n- Payment service offline\n- 30% of transactions affected\n- Revenue and customer trust at immediate risk\n\n**What we need from you RIGHT NOW:**\n1. Drop everything else and join the #incident channel immediately.\n2. Engineering: Begin triage and root cause analysis NOW. No standups, no meetings – incident only until resolved.\n3. Ops/Support: Pull the latest error logs and prepare customer-facing comms.\n4. Leadership: Awaiting updates every 15 minutes in the incident bridge.\n\nEvery minute this continues is revenue lost and customers lost. This is an all-hands, no-excuses situation. We treat this as a SEV-1 until the service is fully restored.\n\nIf you have not yet checked in, do so NOW.\n\nLet's move. Fast.\n\n— [Your Name]",
+      "reference_subject": "URGENT: Payment Service Outage — Immediate Action Required",
+      "reference_body": "Team,\n\nWe are currently experiencing a critical outage in our payment service that is impacting approximately 30% of all transactions. This requires immediate attention from all available engineers.\n\nPlease join the incident bridge call at once and prioritize this issue above all other tasks.\n\nThis is our top priority.\n\nEngineering Lead",
+      "prompt_template": "Write an email.\nIntent: Notify team of critical production issue\nFacts: Payment service is down, Affecting 30% of transactions, Need all hands on deck\nTone: urgent",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Payment service is down' -> FOUND (100%)\n  'Affecting 30% of transactions' -> FOUND (50%)\n  'Need all hands on deck' -> FOUND (100%)"
+        },
+        "tone_alignment": {
+          "score": 0.1111111111111111,
+          "details": "Matched: ['immediately']\nContradictions: []\nScore: 0.11"
+        },
+        "clarity_conciseness": {
+          "score": 0.9447368421052631,
+          "details": "Readability: 7.8 words/sentence -> 0.78\nLength: 148 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 9 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.11)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_05",
+      "intent": "Respond to customer complaint about delayed shipment",
+      "tone": "empathetic",
+      "key_facts": [
+        "Order was delayed by 2 weeks",
+        "Full refund is being processed",
+        "Improved logistics measures are in place"
+      ],
+      "generated_subject": "Regarding Your Delayed Shipment - Our Apologies and Resolution",
+      "generated_body": "Dear [Customer Name],\n\nThank you for reaching out to us about the delay with your recent order. I want to sincerely apologize for the experience you've had. I understand how frustrating it must be to wait longer than expected, and I truly regret the inconvenience this has caused you.\n\nAfter reviewing your order, I can confirm that it was unfortunately delayed by approximately two weeks. I want to assure you that this is not the standard of service we strive to provide, and we take full responsibility for the delay.\n\nHere is what we are doing to make things right:\n\n1. **Full Refund:** A full refund for your order is currently being processed. You should see the credit reflected in your account within 5-7 business days, depending on your payment provider.\n\n2. **Improved Logistics:** We have already implemented enhanced logistics measures to prevent similar delays from occurring in the future. This includes strengthened tracking systems, improved coordination with our shipping partners, and additional quality checks throughout the fulfillment process.\n\nWe value your trust in us, and we are committed to providing you with the reliable and timely service you deserve. Your feedback has been shared with our logistics team to help ensure continuous improvement.\n\nIf you have any further questions or concerns, please don't hesitate to reach out. I'm here to help in any way I can.\n\nOnce again, please accept our heartfelt apologies for the inconvenience. We hope to have the opportunity to serve you better in the future.\n\nWarm regards,\n\n[Your Name]\nCustomer Support Team\n[Company Name]",
+      "reference_subject": "We're Sorry — Your Order Update and Refund",
+      "reference_body": "Dear Sarah,\n\nI completely understand your frustration with the delay in receiving your order. Waiting two weeks beyond the promised delivery date is unacceptable, and I sincerely apologize for the inconvenience this has caused you.\n\nYour full refund has been processed and you should see it reflected in your account within 3-5 business days. Additionally, we have implemented improved logistics measures to prevent similar delays in the future.\n\nYour experience matters deeply to us.\n\nWith sincere apologies,\nCustomer Support Team",
+      "prompt_template": "Write an email.\nIntent: Respond to customer complaint about delayed shipment\nFacts: Order was delayed by 2 weeks, Full refund is being processed, Improved logistics measures are in place\nTone: empathetic",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Order was delayed by 2 weeks' -> FOUND (100%)\n  'Full refund is being processed' -> FOUND (100%)\n  'Improved logistics measures are in place' -> FOUND (80%)"
+        },
+        "tone_alignment": {
+          "score": 0.5,
+          "details": "Matched: ['understand', 'apologize', 'value', 'trust']\nContradictions: []\nScore: 0.50"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 14.4 words/sentence -> 1.00\nLength: 259 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 9 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_06",
+      "intent": "Propose a new remote work policy",
+      "tone": "professional",
+      "key_facts": [
+        "Productivity increased 15% during remote work trial",
+        "Employee satisfaction scores improved by 20%",
+        "Office costs could be reduced by 30% with hybrid model"
+      ],
+      "generated_subject": "Proposal: Adoption of a Hybrid Remote Work Policy",
+      "generated_body": "Dear Team,\n\nI hope this message finds you well. I am writing to share the results of our recent remote work trial and to propose the formal adoption of a hybrid remote work policy.\n\nOver the course of the trial period, we observed the following outcomes:\n\n- **Productivity:** Increased by 15%\n- **Employee Satisfaction:** Improved by 20%\n- **Operational Costs:** Potential reduction of up to 30% with a hybrid model\n\nThese results suggest that a structured hybrid approach could benefit both our team and the organization as a whole. The proposed policy would offer employees greater flexibility while maintaining operational efficiency and collaboration standards.\n\nI would welcome the opportunity to discuss this proposal further and to gather your input on the structure and implementation of the policy. Please let me know a convenient time to meet, or feel free to share your thoughts via email.\n\nThank you for your time and consideration.\n\nBest regards,\n[Your Name]\n[Your Position]",
+      "reference_subject": "Proposal: Hybrid Remote Work Policy",
+      "reference_body": "Dear Leadership Team,\n\nI am writing to propose the adoption of a hybrid remote work policy based on the results of our recent trial period.\n\nDuring the remote work trial, we observed a 15% increase in overall productivity and a 20% improvement in employee satisfaction scores. Additionally, transitioning to a hybrid model would allow us to reduce office-related costs by approximately 30%.\n\nI recommend a structured approach: three days remote, two days in-office.\n\nBest regards,\nHR Director",
+      "prompt_template": "Write an email.\nIntent: Propose a new remote work policy\nFacts: Productivity increased 15% during remote work trial, Employee satisfaction scores improved by 20%, Office costs could be reduced by 30% with hybrid model\nTone: professional",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Productivity increased 15% during remote work tria' -> FOUND (83%)\n  'Employee satisfaction scores improved by 20%' -> FOUND (75%)\n  'Office costs could be reduced by 30% with hybrid m' -> FOUND (71%)"
+        },
+        "tone_alignment": {
+          "score": 0.5,
+          "details": "Matched: ['regards', 'opportunity', 'discuss', 'thank you']\nContradictions: []\nScore: 0.50"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 19.8 words/sentence -> 1.00\nLength: 158 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 8 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_07",
+      "intent": "Follow up on an unpaid invoice",
+      "tone": "professional",
+      "key_facts": [
+        "Invoice #INV-2024-0892 is 30 days overdue",
+        "Amount owed is $4,500",
+        "Payment terms are Net 30"
+      ],
+      "generated_subject": "Payment Reminder: Invoice #INV-2024-0892",
+      "generated_body": "Dear [Client Name],\n\nI hope this message finds you well. I am writing to follow up regarding Invoice #INV-2024-0892, which was issued on [Invoice Date] and is now 30 days past its due date.\n\nAccording to our records, the outstanding balance of $4,500 remains unpaid. As outlined in our payment terms (Net 30), this invoice was due on [Due Date].\n\nWe kindly request that payment be processed at your earliest convenience. For your reference, the invoice details are as follows:\n\n- Invoice Number: INV-2024-0892\n- Amount Due: $4,500\n- Due Date: [Due Date]\n\nIf payment has already been issued, please disregard this notice. However, if there are any issues or circumstances preventing timely payment, we would appreciate the opportunity to discuss them and find a suitable resolution.\n\nPlease let us know if you need a copy of the invoice or have any questions regarding the balance owed.\n\nThank you for your prompt attention to this matter. We value our business relationship and look forward to your continued partnership.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Your Company]\n[Contact Information]",
+      "reference_subject": "Reminder: Overdue Invoice #INV-2024-0892",
+      "reference_body": "Dear Accounts Payable,\n\nI hope this message finds you well. I am writing to follow up on invoice #INV-2024-0892, which is now 30 days past due.\n\nThe outstanding amount is $4,500 for services rendered per our agreed payment terms of Net 30. I have attached a copy of the original invoice for your reference.\n\nCould you please confirm the status of this payment?\n\nBest regards,\nFinance Team",
+      "prompt_template": "Write an email.\nIntent: Follow up on an unpaid invoice\nFacts: Invoice #INV-2024-0892 is 30 days overdue, Amount owed is $4,500, Payment terms are Net 30\nTone: professional",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Invoice #INV-2024-0892 is 30 days overdue' -> FOUND (75%)\n  'Amount owed is $4,500' -> FOUND (100%)\n  'Payment terms are Net 30' -> FOUND (100%)"
+        },
+        "tone_alignment": {
+          "score": 0.625,
+          "details": "Matched: ['regards', 'appreciate', 'opportunity', 'discuss', 'thank you']\nContradictions: []\nScore: 0.62"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 16.2 words/sentence -> 1.00\nLength: 178 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 4 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_08",
+      "intent": "Congratulate team on successful product launch",
+      "tone": "enthusiastic",
+      "key_facts": [
+        "Product launched on schedule",
+        "First week sales exceeded targets by 40%",
+        "Customer feedback has been overwhelmingly positive"
+      ],
+      "generated_subject": "🎉 We Did It! Congratulations on a Phenomenal Product Launch!",
+      "generated_body": "Hi Team,\n\nI am absolutely thrilled to congratulate each and every one of you on the incredible success of our product launch! What we accomplished together is nothing short of outstanding, and I could not be prouder to be part of this amazing team.\n\nNot only did we launch the product right on schedule—a testament to your dedication, collaboration, and meticulous planning—but we also blew past our first-week sales targets by a remarkable 40%! That is an extraordinary achievement that speaks volumes about the quality of the product and the hard work everyone put in to bring it to life.\n\nAnd the best part? The customer feedback has been overwhelmingly positive. Hearing our users rave about the product is the most rewarding validation of the effort, creativity, and countless hours you all invested. You have built something that people truly love, and that is the highest compliment we could ask for.\n\nThis launch is a shining example of what we can accomplish when we come together with a shared vision and unwavering commitment. Thank you for your passion, your late nights, your problem-solving, and your teamwork. You should all feel incredibly proud of what you have achieved—because you have earned every bit of this success.\n\nLet us take a moment to celebrate this milestone, and then let us carry this incredible momentum forward. The future looks brighter than ever!\n\nOnce again, congratulations, and thank you for making this launch one for the books! 🚀\n\nWith gratitude and excitement,\n[Your Name]",
+      "reference_subject": "Incredible Launch — You All Made It Happen!",
+      "reference_body": "Hi Team,\n\nI wanted to take a moment to congratulate each and every one of you on an absolutely phenomenal product launch!\n\nWe hit our launch date on schedule, and the results speak for themselves: first week sales have exceeded our targets by an impressive 40%. The customer feedback we've received has been overwhelmingly positive.\n\nThis achievement is a testament to your hard work and dedication.\n\nWith gratitude,\nProduct Lead",
+      "prompt_template": "Write an email.\nIntent: Congratulate team on successful product launch\nFacts: Product launched on schedule, First week sales exceeded targets by 40%, Customer feedback has been overwhelmingly positive\nTone: enthusiastic",
+      "metrics": {
+        "fact_recall": {
+          "score": 1.0,
+          "details": "Recalled 3/3 facts.\n  'Product launched on schedule' -> FOUND (67%)\n  'First week sales exceeded targets by 40%' -> FOUND (80%)\n  'Customer feedback has been overwhelmingly positive' -> FOUND (100%)"
+        },
+        "tone_alignment": {
+          "score": 0.625,
+          "details": "Matched: ['amazing', 'incredible', 'thrilled', 'proud', 'outstanding']\nContradictions: []\nScore: 0.62"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 16.7 words/sentence -> 1.00\nLength: 250 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 10 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": []
+    },
+    {
+      "scenario_id": "scenario_09",
+      "intent": "Request meeting to discuss partnership opportunity",
+      "tone": "formal",
+      "key_facts": [
+        "Potential partnership between TechCo and InnovateLab",
+        "Synergies in AI and machine learning capabilities",
+        "Target timeline is Q4 2026"
+      ],
+      "generated_subject": "Request for Meeting to Discuss Potential Partnership Opportunity",
+      "generated_body": "Dear [Recipient Name],\n\nI hope this message finds you well. I am writing to request a meeting at your earliest convenience to discuss a potential partnership between TechCo and InnovateLab.\n\nHaving reviewed the respective capabilities of both organizations, I believe there are considerable synergies to be explored, particularly in the areas of artificial intelligence and machine learning. A collaborative engagement between our teams could yield mutually beneficial outcomes and strengthen our positions within these rapidly evolving fields.\n\nOur objective is to initiate discussions with the aim of finalizing terms within the fourth quarter of 2026. To that end, I would appreciate the opportunity to meet with you or a member of your leadership team to further explore the scope of this partnership.\n\nPlease let me know your availability over the coming weeks, and I will be glad to accommodate a time that is convenient for you. Should you wish to suggest a preferred format for the meeting—whether in person or via video conference—I am happy to proceed accordingly.\n\nThank you for your time and consideration. I look forward to your response.\n\nKind regards,\n[Your Full Name]\n[Your Title]\n[Your Company]\n[Contact Information]",
+      "reference_subject": "Partnership Discussion — TechCo and InnovateLab",
+      "reference_body": "Dear Dr. Williams,\n\nI hope this letter finds you well. I am writing on behalf of TechCo to explore a potential partnership with InnovateLab.\n\nOur analysis has identified significant synergies between our respective AI and machine learning capabilities. We are targeting Q4 2026 for any formalized arrangement.\n\nWould you be available for an introductory call during the week of June 23rd?\n\nKind regards,\nVP of Business Development\nTechCo",
+      "prompt_template": "Write an email.\nIntent: Request meeting to discuss partnership opportunity\nFacts: Potential partnership between TechCo and InnovateLab, Synergies in AI and machine learning capabilities, Target timeline is Q4 2026\nTone: formal",
+      "metrics": {
+        "fact_recall": {
+          "score": 0.6666666666666666,
+          "details": "Recalled 2/3 facts.\n  'Potential partnership between TechCo and InnovateL' -> FOUND (100%)\n  'Synergies in AI and machine learning capabilities' -> FOUND (100%)\n  'Target timeline is Q4 2026' -> MISSING (0%)"
+        },
+        "tone_alignment": {
+          "score": 0.25,
+          "details": "Matched: ['dear', 'request']\nContradictions: []\nScore: 0.25"
+        },
+        "clarity_conciseness": {
+          "score": 1.0,
+          "details": "Readability: 17.5 words/sentence -> 1.00\nLength: 192 words -> 1.00\nRedundancy: 0 repeated phrases -> 1.00\nSubject: 8 words -> 1.00"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "Tone alignment low (0.25)",
+        "Max retries (2) reached — review manually"
+      ]
+    },
+    {
+      "scenario_id": "scenario_10",
+      "intent": "Apologize for a service outage affecting customers",
+      "tone": "empathetic",
+      "key_facts": [
+        "Database outage lasted 4 hours yesterday",
+        "Root cause was a failed migration script",
+        "Monitoring and safeguards have been improved"
+      ],
+      "generated_subject": "ERROR",
+      "generated_body": "Failed: [429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}",
+      "reference_subject": "Our Apology — Yesterday's Service Disruption",
+      "reference_body": "Dear Valued Customer,\n\nI am writing to personally apologize for the service disruption you experienced yesterday. Our database was unavailable for approximately four hours, and I understand how frustrating this was for you.\n\nThe root cause was a failed migration script. We have implemented enhanced monitoring systems and additional safeguards to prevent this from happening again.\n\nWe value your trust in our platform.\n\nWith sincere apologies,\nCTO",
+      "metrics": {
+        "fact_recall": {
+          "score": 0.0,
+          "details": "[429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}"
+        },
+        "tone_alignment": {
+          "score": 0.0,
+          "details": "[429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}"
+        },
+        "clarity_conciseness": {
+          "score": 0.0,
+          "details": "[429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}"
+        }
+      },
+      "generation_time_seconds": 0.0,
+      "guardrail_warnings": [
+        "[429] Too Many Requests\n{'status': 429, 'title': 'Too Many Requests'}"
+      ]
+    }
+  ],
+  "model_a_averages": {
+    "fact_recall": 0.9333,
+    "tone_alignment": 0.3958,
+    "clarity_conciseness": 0.9923,
+    "overall": 0.7738
+  },
+  "model_b_averages": {
+    "fact_recall": 0.8,
+    "tone_alignment": 0.3911,
+    "clarity_conciseness": 0.8925,
+    "overall": 0.6945
+  },
+  "summary": {
+    "total_scenarios": 10,
+    "winner": "OpenAI gpt-oss 120b + Advanced",
+    "overall_delta": 0.0793
+  }
+}

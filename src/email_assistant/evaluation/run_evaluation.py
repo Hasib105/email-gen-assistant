@@ -20,6 +20,8 @@ from email_assistant.evaluation.metrics import (
 )
 from email_assistant.evaluation.scenarios import TEST_SCENARIOS, TestScenario
 
+RATE_LIMIT_DELAY = 20  # seconds between API calls to avoid 429
+
 OUTPUT_DIR = Path("results")
 
 
@@ -30,11 +32,24 @@ class ModelConfig:
     strategy: str  # "advanced" or "naive"
 
 
-DEFAULT_A = ModelConfig(name="DeepSeek V4 Flash + Advanced", model="deepseek-ai/deepseek-v4-flash", strategy="advanced")
-DEFAULT_B = ModelConfig(name="MiniMax M3 + Naive", model="minimaxai/minimax-m3", strategy="naive")
+DEFAULT_A = ModelConfig(
+    name="OpenAI gpt-oss 120b + Advanced",
+    model="openai/gpt-oss-120b",
+    strategy="advanced",
+)
+DEFAULT_B = ModelConfig(
+    name="MiniMax M3 + Naive",
+    model="minimaxai/minimax-m3",
+    strategy="naive",
+)
 
 
-def _eval(scenario: TestScenario, subject: str, body: str) -> dict:
+def _eval(
+    scenario: TestScenario,
+    subject: str,
+    body: str,
+    prompt_template: str = "",
+) -> dict:
     fact = FactRecallMetric().evaluate(scenario.key_facts, body)
     tone = ToneAlignmentMetric().evaluate(scenario.tone, body)
     clarity = ClarityConcisenessMetric().evaluate(subject, body)
@@ -47,24 +62,45 @@ def _eval(scenario: TestScenario, subject: str, body: str) -> dict:
         "generated_body": body,
         "reference_subject": scenario.reference_subject,
         "reference_body": scenario.reference_body,
+        "prompt_template": prompt_template,
         "metrics": {
             "fact_recall": {"score": fact.score, "details": fact.details},
             "tone_alignment": {"score": tone.score, "details": tone.details},
-            "clarity_conciseness": {"score": clarity.score, "details": clarity.details},
+            "clarity_conciseness": {
+                "score": clarity.score,
+                "details": clarity.details,
+            },
         },
     }
 
 
 def _averages(results: list[dict]) -> dict:
     if not results:
-        return {"fact_recall": 0.0, "tone_alignment": 0.0, "clarity_conciseness": 0.0, "overall": 0.0}
+        return {
+            "fact_recall": 0.0,
+            "tone_alignment": 0.0,
+            "clarity_conciseness": 0.0,
+            "overall": 0.0,
+        }
     fr = sum(r["metrics"]["fact_recall"]["score"] for r in results) / len(results)
     ta = sum(r["metrics"]["tone_alignment"]["score"] for r in results) / len(results)
-    cc = sum(r["metrics"]["clarity_conciseness"]["score"] for r in results) / len(results)
-    return {"fact_recall": round(fr, 4), "tone_alignment": round(ta, 4), "clarity_conciseness": round(cc, 4), "overall": round((fr + ta + cc) / 3, 4)}
+    cc = (
+        sum(r["metrics"]["clarity_conciseness"]["score"] for r in results)
+        / len(results)
+    )
+    return {
+        "fact_recall": round(fr, 4),
+        "tone_alignment": round(ta, 4),
+        "clarity_conciseness": round(cc, 4),
+        "overall": round((fr + ta + cc) / 3, 4),
+    }
 
 
-def _run_model(cfg: ModelConfig, scenarios: list[TestScenario], settings: Settings) -> tuple[list[dict], dict]:
+def _run_model(
+    cfg: ModelConfig,
+    scenarios: list[TestScenario],
+    settings: Settings,
+) -> tuple[list[dict], dict]:
     results: list[dict] = []
     print(f"\n  [{cfg.name}] Running {len(scenarios)} scenarios...")
 
@@ -72,21 +108,33 @@ def _run_model(cfg: ModelConfig, scenarios: list[TestScenario], settings: Settin
         print(f"    [{i}/{len(scenarios)}] {s.id}: {s.intent[:50]}...")
         try:
             out = generate_with_guardrails(
-                intent=s.intent, key_facts=s.key_facts, tone=s.tone,
-                model=cfg.model, strategy=cfg.strategy,
+                intent=s.intent,
+                key_facts=s.key_facts,
+                tone=s.tone,
+                model=cfg.model,
+                strategy=cfg.strategy,
             )
             subject, body = out["subject"], out["body"]
-            print(f"      retries={out['retries']} passed={out['passed']} — Subject: {subject}")
-            r = _eval(s, subject, body)
-            r["generation_time_seconds"] = 0.0  # pipeline doesn't track this separately
+            prompt = out["prompt_template"]
+            print(
+                f"      retries={out['retries']} passed={out['passed']}"
+                f" — Subject: {subject}"
+            )
+            r = _eval(s, subject, body, prompt)
+            r["generation_time_seconds"] = 0.0
             r["guardrail_warnings"] = out["warnings"]
             results.append(r)
         except Exception as exc:
             print(f"      ERROR: {exc}")
             results.append({
-                "scenario_id": s.id, "intent": s.intent, "tone": s.tone, "key_facts": s.key_facts,
-                "generated_subject": "ERROR", "generated_body": f"Failed: {exc}",
-                "reference_subject": s.reference_subject, "reference_body": s.reference_body,
+                "scenario_id": s.id,
+                "intent": s.intent,
+                "tone": s.tone,
+                "key_facts": s.key_facts,
+                "generated_subject": "ERROR",
+                "generated_body": f"Failed: {exc}",
+                "reference_subject": s.reference_subject,
+                "reference_body": s.reference_body,
                 "metrics": {
                     "fact_recall": {"score": 0.0, "details": str(exc)},
                     "tone_alignment": {"score": 0.0, "details": str(exc)},
@@ -95,13 +143,21 @@ def _run_model(cfg: ModelConfig, scenarios: list[TestScenario], settings: Settin
                 "generation_time_seconds": 0.0,
                 "guardrail_warnings": [str(exc)],
             })
+        time.sleep(RATE_LIMIT_DELAY)
 
     avgs = _averages(results)
     print(f"  [{cfg.name}] Overall: {avgs['overall']:.2%}")
     return results, avgs
 
 
-def _write_analysis(a: ModelConfig, b: ModelConfig, ra: list[dict], rb: list[dict], aa: dict, ab: dict) -> Path:
+def _write_analysis(
+    a: ModelConfig,
+    b: ModelConfig,
+    ra: list[dict],
+    rb: list[dict],
+    aa: dict,
+    ab: dict,
+) -> Path:
     OUTPUT_DIR.mkdir(exist_ok=True)
 
     winner_name = a.name if aa["overall"] >= ab["overall"] else b.name
@@ -109,27 +165,45 @@ def _write_analysis(a: ModelConfig, b: ModelConfig, ra: list[dict], rb: list[dic
     aw = aa if winner_name == a.name else ab
     al = ab if winner_name == a.name else aa
 
-    gaps = {k: aw[k] - al[k] for k in ["fact_recall", "tone_alignment", "clarity_conciseness"]}
+    gaps = {
+        k: aw[k] - al[k]
+        for k in ["fact_recall", "tone_alignment", "clarity_conciseness"]
+    }
     biggest_gap = max(gaps, key=gaps.get)  # type: ignore
 
     loser_r = rb if loser_name == b.name else ra
     worst = sorted(
-        [(r["scenario_id"], r["metrics"]["fact_recall"]["score"] + r["metrics"]["tone_alignment"]["score"] + r["metrics"]["clarity_conciseness"]["score"]) for r in loser_r if r["generated_subject"] != "ERROR"],
+        [
+            (
+                r["scenario_id"],
+                r["metrics"]["fact_recall"]["score"]
+                + r["metrics"]["tone_alignment"]["score"]
+                + r["metrics"]["clarity_conciseness"]["score"],
+            )
+            for r in loser_r
+            if r["generated_subject"] != "ERROR"
+        ],
         key=lambda x: x[1],
     )[:3]
+
+    fr_a, fr_b = aa["fact_recall"], ab["fact_recall"]
+    ta_a, ta_b = aa["tone_alignment"], ab["tone_alignment"]
+    cc_a, cc_b = aa["clarity_conciseness"], ab["clarity_conciseness"]
+    ov_a, ov_b = aa["overall"], ab["overall"]
 
     md = f"""# Evaluation Summary
 
 | Metric | {a.name} | {b.name} | Delta |
 |---|---|---|---|
-| Fact Recall | {aa['fact_recall']:.2%} | {ab['fact_recall']:.2%} | {aa['fact_recall'] - ab['fact_recall']:+.2%} |
-| Tone Alignment | {aa['tone_alignment']:.2%} | {ab['tone_alignment']:.2%} | {aa['tone_alignment'] - ab['tone_alignment']:+.2%} |
-| Clarity/Conciseness | {aa['clarity_conciseness']:.2%} | {ab['clarity_conciseness']:.2%} | {aa['clarity_conciseness'] - ab['clarity_conciseness']:+.2%} |
-| **Overall** | **{aa['overall']:.2%}** | **{ab['overall']:.2%}** | **{aa['overall'] - ab['overall']:+.2%}** |
+| Fact Recall | {fr_a:.2%} | {fr_b:.2%} | {fr_a - fr_b:+.2%} |
+| Tone Alignment | {ta_a:.2%} | {ta_b:.2%} | {ta_a - ta_b:+.2%} |
+| Clarity/Conciseness | {cc_a:.2%} | {cc_b:.2%} | {cc_a - cc_b:+.2%} |
+| **Overall** | **{ov_a:.2%}** | **{ov_b:.2%}** | **{ov_a - ov_b:+.2%}** |
 
 **Best performer:** {winner_name}
 
-**Biggest failure mode of {loser_name}:** {biggest_gap.replace("_", " ").title()} — {gaps[biggest_gap]:+.2%} difference.
+**Biggest failure mode of {loser_name}:**
+{biggest_gap.replace("_", " ").title()} — {gaps[biggest_gap]:+.2%} difference.
 
 **Worst scenarios for {loser_name}:**
 {chr(10).join(f"- {sid}: {score:.2f}" for sid, score in worst)}
@@ -138,18 +212,44 @@ def _write_analysis(a: ModelConfig, b: ModelConfig, ra: list[dict], rb: list[dic
 """
     (OUTPUT_DIR / "analysis.md").write_text(md)
 
-    with open(OUTPUT_DIR / "report.csv", "w", newline="", encoding="utf-8") as f:
+    with open(
+        OUTPUT_DIR / "report.csv", "w", newline="", encoding="utf-8"
+    ) as f:
         w = csv.writer(f)
-        w.writerow(["model", "scenario", "intent", "tone", "fact_recall", "tone_alignment", "clarity_conciseness", "overall"])
+        w.writerow([
+            "model", "scenario", "intent", "tone",
+            "fact_recall", "tone_alignment",
+            "clarity_conciseness", "overall",
+        ])
         for r in ra:
-            avg = (r["metrics"]["fact_recall"]["score"] + r["metrics"]["tone_alignment"]["score"] + r["metrics"]["clarity_conciseness"]["score"]) / 3
-            w.writerow([a.name, r["scenario_id"], r["intent"], r["tone"], r["metrics"]["fact_recall"]["score"], r["metrics"]["tone_alignment"]["score"], r["metrics"]["clarity_conciseness"]["score"], round(avg, 4)])
+            fr_s = r["metrics"]["fact_recall"]["score"]
+            ta_s = r["metrics"]["tone_alignment"]["score"]
+            cc_s = r["metrics"]["clarity_conciseness"]["score"]
+            avg = (fr_s + ta_s + cc_s) / 3
+            w.writerow([
+                a.name, r["scenario_id"], r["intent"], r["tone"],
+                fr_s, ta_s, cc_s, round(avg, 4),
+            ])
         for r in rb:
-            avg = (r["metrics"]["fact_recall"]["score"] + r["metrics"]["tone_alignment"]["score"] + r["metrics"]["clarity_conciseness"]["score"]) / 3
-            w.writerow([b.name, r["scenario_id"], r["intent"], r["tone"], r["metrics"]["fact_recall"]["score"], r["metrics"]["tone_alignment"]["score"], r["metrics"]["clarity_conciseness"]["score"], round(avg, 4)])
+            fr_s = r["metrics"]["fact_recall"]["score"]
+            ta_s = r["metrics"]["tone_alignment"]["score"]
+            cc_s = r["metrics"]["clarity_conciseness"]["score"]
+            avg = (fr_s + ta_s + cc_s) / 3
+            w.writerow([
+                b.name, r["scenario_id"], r["intent"], r["tone"],
+                fr_s, ta_s, cc_s, round(avg, 4),
+            ])
         w.writerow([])
-        w.writerow([a.name, "", "", "AVG", aa["fact_recall"], aa["tone_alignment"], aa["clarity_conciseness"], aa["overall"]])
-        w.writerow([b.name, "", "", "AVG", ab["fact_recall"], ab["tone_alignment"], ab["clarity_conciseness"], ab["overall"]])
+        w.writerow([
+            a.name, "", "", "AVG",
+            aa["fact_recall"], aa["tone_alignment"],
+            aa["clarity_conciseness"], aa["overall"],
+        ])
+        w.writerow([
+            b.name, "", "", "AVG",
+            ab["fact_recall"], ab["tone_alignment"],
+            ab["clarity_conciseness"], ab["overall"],
+        ])
 
     return OUTPUT_DIR / "analysis.md"
 
@@ -170,16 +270,38 @@ def run_evaluation(
     print(f"Scenarios: {len(TEST_SCENARIOS)}")
 
     ra, aa = _run_model(a, TEST_SCENARIOS, settings)
+    print(f"\n  Pausing {RATE_LIMIT_DELAY}s before switching models...")
+    time.sleep(RATE_LIMIT_DELAY)
     rb, ab = _run_model(b, TEST_SCENARIOS, settings)
 
     report = {
         "metric_definitions": {
-            "fact_recall": {"name": "Fact Recall Score", "description": "Whether all input facts appear in the output.", "scoring": "0.0-1.0"},
-            "tone_alignment": {"name": "Tone Alignment Score", "description": "Whether the email matches the requested tone.", "scoring": "0.0-1.0"},
-            "clarity_conciseness": {"name": "Clarity & Conciseness Score", "description": "Readability, appropriate length, no redundancy.", "scoring": "0.0-1.0"},
+            "fact_recall": {
+                "name": "Fact Recall Score",
+                "description": "Whether all input facts appear in the output.",
+                "scoring": "0.0-1.0",
+            },
+            "tone_alignment": {
+                "name": "Tone Alignment Score",
+                "description": "Whether the email matches the requested tone.",
+                "scoring": "0.0-1.0",
+            },
+            "clarity_conciseness": {
+                "name": "Clarity & Conciseness Score",
+                "description": "Readability, appropriate length, no redundancy.",
+                "scoring": "0.0-1.0",
+            },
         },
-        "model_a": {"name": a.name, "model": a.model, "strategy": a.strategy},
-        "model_b": {"name": b.name, "model": b.model, "strategy": b.strategy},
+        "model_a": {
+            "name": a.name,
+            "model": a.model,
+            "strategy": a.strategy,
+        },
+        "model_b": {
+            "name": b.name,
+            "model": b.model,
+            "strategy": b.strategy,
+        },
         "model_a_results": ra,
         "model_b_results": rb,
         "model_a_averages": aa,
@@ -192,8 +314,11 @@ def run_evaluation(
     }
 
     OUTPUT_DIR.mkdir(exist_ok=True)
-    (OUTPUT_DIR / "report.json").write_text(json.dumps(report, indent=2, ensure_ascii=False))
-    analysis_path = _write_analysis(a, b, ra, rb, aa, ab)
+    (OUTPUT_DIR / "report.json").write_text(
+        json.dumps(report, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    _write_analysis(a, b, ra, rb, aa, ab)
 
     print(f"\n{'='*70}")
     print("COMPLETE")
@@ -201,11 +326,17 @@ def run_evaluation(
     print(f"{'Metric':<25} {a.name:>35} {b.name:>35}")
     print("-" * 97)
     print(f"{'Fact Recall':<25} {aa['fact_recall']:>34.2%} {ab['fact_recall']:>34.2%}")
-    print(f"{'Tone Alignment':<25} {aa['tone_alignment']:>34.2%} {ab['tone_alignment']:>34.2%}")
-    print(f"{'Clarity/Conciseness':<25} {aa['clarity_conciseness']:>34.2%} {ab['clarity_conciseness']:>34.2%}")
+    print(
+        f"{'Tone Alignment':<25} {aa['tone_alignment']:>34.2%}"
+        f" {ab['tone_alignment']:>34.2%}"
+    )
+    print(
+        f"{'Clarity/Conciseness':<25} {aa['clarity_conciseness']:>34.2%}"
+        f" {ab['clarity_conciseness']:>34.2%}"
+    )
     print(f"{'OVERALL':<25} {aa['overall']:>34.2%} {ab['overall']:>34.2%}")
     print(f"\nWinner: {report['summary']['winner']}")
-    print(f"Outputs: results/report.json, results/report.csv, results/analysis.md\n")
+    print("Outputs: results/report.json, results/report.csv, results/analysis.md\n")
 
     return report
 

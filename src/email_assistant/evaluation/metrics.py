@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import ClassVar
 
 
 @dataclass
@@ -55,25 +56,50 @@ class FactRecallMetric:
 
         score = facts_found / len(key_facts)
         summary = f"Recalled {facts_found}/{len(key_facts)} facts."
-        return MetricResult(name="fact_recall", score=score, details=summary + "\n" + "\n".join(details))
+        return MetricResult(
+            name="fact_recall",
+            score=score,
+            details=summary + "\n" + "\n".join(details),
+        )
 
 
 class ToneAlignmentMetric:
     """Does the email match the requested tone?"""
 
-    TONE_INDICATORS: dict[str, list[str]] = {
-        "professional": ["regards", "sincerely", "appreciate", "opportunity", "discuss", "review", "looking forward", "thank you"],
-        "formal": ["dear", "sincerely", "respectfully", "request", "pursuant", "hereby", "for your review", "at your convenience"],
-        "casual": ["hey", "hi", "what's up", "cool", "awesome", "wanna", "let me know", "cheers", "talk soon", "no worries"],
-        "urgent": ["urgent", "immediately", "critical", "asap", "right away", "priority", "emergency", "at once", "without delay"],
-        "empathetic": ["understand", "sincerely sorry", "apologize", "frustration", "commitment", "value", "trust", "personally"],
-        "enthusiastic": ["amazing", "incredible", "fantastic", "excited", "thrilled", "proud", "phenomenal", "outstanding"],
+    TONE_INDICATORS: ClassVar[dict[str, list[str]]] = {
+        "professional": [
+            "regards", "sincerely", "appreciate", "opportunity",
+            "discuss", "review", "looking forward", "thank you",
+        ],
+        "formal": [
+            "dear", "sincerely", "respectfully", "request",
+            "pursuant", "hereby", "for your review", "at your convenience",
+        ],
+        "casual": [
+            "hey", "hi", "what's up", "cool", "awesome",
+            "wanna", "let me know", "cheers", "talk soon", "no worries",
+        ],
+        "urgent": [
+            "urgent", "immediately", "critical", "asap", "right away",
+            "priority", "emergency", "at once", "without delay",
+        ],
+        "empathetic": [
+            "understand", "sincerely sorry", "apologize", "frustration",
+            "commitment", "value", "trust", "personally",
+        ],
+        "enthusiastic": [
+            "amazing", "incredible", "fantastic", "excited",
+            "thrilled", "proud", "phenomenal", "outstanding",
+        ],
     }
 
-    CONTRADICTING_TONES: dict[str, list[str]] = {
+    CONTRADICTING_TONES: ClassVar[dict[str, list[str]]] = {
         "formal": ["hey", "wanna", "gonna", "cool", "awesome", "no worries"],
         "casual": ["hereby", "pursuant", "respectfully"],
-        "urgent": ["at your convenience", "no rush", "whenever possible", "take your time"],
+        "urgent": [
+            "at your convenience", "no rush",
+            "whenever possible", "take your time",
+        ],
         "empathetic": ["unacceptable", "demand", "failure"],
     }
 
